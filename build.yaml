@@ -1,0 +1,33 @@
+targets:
+  $default:
+    builders:
+      auto_route_generator:auto_route_generator:
+        generate_for:
+          - lib/src/**/pages/**_page.dart
+          - lib/src/**/pages/**_screen.dart
+          - lib/src/**/**_page.dart
+          - lib/src/**/**/app_router.dart
+      freezed|freezed:
+        enabled: true
+        generate_for:
+          include:
+            - lib/src/**/**_exception.dart
+            - lib/src/**/models/**.dart
+            - lib/src/**/form/**.dart
+            - lib/src/**/bloc/**.dart
+            - lib/src/**/cubit/**.dart
+      json_serializable:
+        options:
+          any_map: false
+          checked: false
+          constructor: ""
+          create_factory: true
+          create_field_map: false
+          create_per_field_to_json: false
+          create_to_json: true
+          disallow_unrecognized_keys: false
+          explicit_to_json: true
+          field_rename: none
+          generic_argument_factories: false
+          ignore_unannotated: false
+          include_if_null: true
