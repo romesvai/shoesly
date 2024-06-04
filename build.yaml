@@ -6,6 +6,7 @@ targets:
           - lib/src/**/pages/**_page.dart
           - lib/src/**/pages/**_screen.dart
           - lib/src/**/**_page.dart
+          - lib/src/**/**_screen.dart
           - lib/src/**/**/app_router.dart
       freezed|freezed:
         enabled: true
