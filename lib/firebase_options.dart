@@ -50,19 +50,20 @@ class DefaultFirebaseOptions {
   }
 
   static const FirebaseOptions android = FirebaseOptions(
-    apiKey: 'AIzaSyAd6A-VtWZL5-0LJDu8uTVKMbrOX9pr-MA',
-    appId: '1:876184056098:android:f9b31979dcd452152c357b',
-    messagingSenderId: '876184056098',
-    projectId: 'shoesly-60986',
-    storageBucket: 'shoesly-60986.appspot.com',
+    apiKey: 'AIzaSyDLiSH2TO9tfY9N7pofLsn0T7chhZZ2N7s',
+    appId: '1:918439749054:android:18e55e7b2dd9860db705ef',
+    messagingSenderId: '918439749054',
+    projectId: 'shoeslyps',
+    storageBucket: 'shoeslyps.appspot.com',
   );
 
   static const FirebaseOptions ios = FirebaseOptions(
-    apiKey: 'AIzaSyC3zDuRYltbNdSSN6OejW3DIACzyRhvSYY',
-    appId: '1:876184056098:ios:d3d1cc11c2f59c9a2c357b',
-    messagingSenderId: '876184056098',
-    projectId: 'shoesly-60986',
-    storageBucket: 'shoesly-60986.appspot.com',
+    apiKey: 'AIzaSyD-RfRaoHmtxstv7BYoRWR-21fLt3gISAQ',
+    appId: '1:918439749054:ios:939d637021012250b705ef',
+    messagingSenderId: '918439749054',
+    projectId: 'shoeslyps',
+    storageBucket: 'shoeslyps.appspot.com',
     iosBundleId: 'com.example.shoeslyPs',
   );
+
 }

@@ -13,7 +13,8 @@ targets:
         generate_for:
           include:
             - lib/src/**/**_exception.dart
-            - lib/src/**/models/**.dart
+            - lib/src/**/**_input.dart
+            - lib/src/**/model/**.dart
             - lib/src/**/form/**.dart
             - lib/src/**/bloc/**.dart
             - lib/src/**/cubit/**.dart
