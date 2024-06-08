@@ -7,5 +7,6 @@
   "connectionError": "No network connection",
   "connectionTimeout": "Connection timeout",
   "unexpectedNetworkError": "Unexpected network error",
-  "discover": "Discover"
+  "discover": "Discover",
+  "all": "All"
 }

@@ -7,11 +7,12 @@ import 'package:shoesly_ps/src/features/reviews/domain/model/review_data_model.d
 @Injectable(as: AddDataRepository)
 class AddDataRepositoryImpl implements AddDataRepository {
   AddDataRepositoryImpl(this._addDataSource);
+
   final AddDataSource _addDataSource;
 
   @override
-  Future<void> addShoes(List<ShoeDataModel> shoes) {
-    return _addDataSource.addShoes(shoes);
+  Future<void> addShoe(ShoeDataModel shoe) {
+    return _addDataSource.addShoes(shoe);
   }
 
   @override

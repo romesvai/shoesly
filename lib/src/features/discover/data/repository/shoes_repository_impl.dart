@@ -14,9 +14,14 @@ class ShoesRepositoryImpl implements ShoesRepository {
   Future<ShoesResponseModel> getShoes({
     DocumentSnapshot<Object?>? lastDocument,
     int limit = 10,
+    String? brand,
   }) =>
       _shoesRemoteDataSource.getShoes(
         lastDocument: lastDocument,
         limit: limit,
+        brand: brand,
       );
+
+  @override
+  Future<List<String>> getBrands() => _shoesRemoteDataSource.getBrands();
 }
