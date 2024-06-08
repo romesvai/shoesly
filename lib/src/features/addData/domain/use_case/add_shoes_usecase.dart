@@ -3,9 +3,9 @@ import 'package:injectable/injectable.dart';
 import 'package:shoesly_ps/src/core/base/base_usecase.dart';
 import 'package:shoesly_ps/src/core/mixins/exception_mixin.dart';
 import 'package:shoesly_ps/src/core/typedef/either_exception.dart';
-import 'package:shoesly_ps/src/features/addData/domain/models/add_shoes_usecase_input.dart';
+import 'package:shoesly_ps/src/features/addData/domain/model/add_shoes_usecase_input.dart';
 
-import 'package:shoesly_ps/src/features/addData/domain/repositories/add_data_repository.dart';
+import 'package:shoesly_ps/src/features/addData/domain/repository/add_data_repository.dart';
 
 @injectable
 class AddShoesUsecase

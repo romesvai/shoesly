@@ -8,7 +8,7 @@ abstract class AppTextTheme {
     decoration: TextDecoration.none,
     fontWeight: AppFontWeight.regular,
     textBaseline: TextBaseline.alphabetic,
-    color: AppColors.secondary,
+    color: AppColors.textBlack,
   );
 
   static final buttonTextStyle = GoogleFonts.urbanist(
@@ -145,7 +145,7 @@ abstract class AppTextTheme {
       bodyMedium: bodyMedium,
       bodySmall: bodySmall,
     ).apply(
-      displayColor: AppColors.secondary,
+      displayColor: AppColors.textBlack,
     );
   }
 }

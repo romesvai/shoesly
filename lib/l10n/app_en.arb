@@ -1,9 +1,11 @@
-{
+{ 
+  "@@locale": "en",
   "appName": "Shoesly",
   "exceptionUnsupportedPlatform": "The platform is not supported.",
   "operationNotAllowed": "Operation not allowed.",
   "exceptionUnexpected": "Something went wrong!",
   "connectionError": "No network connection",
   "connectionTimeout": "Connection timeout",
-  "unexpectedNetworkError": "Unexpected network error"
+  "unexpectedNetworkError": "Unexpected network error",
+  "discover": "Discover"
 }

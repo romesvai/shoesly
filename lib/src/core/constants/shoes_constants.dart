@@ -1,11 +1,13 @@
 import 'package:shoesly_ps/src/features/discover/domain/model/shoe_data_model.dart';
+import 'package:uuid/uuid.dart';
 
 final now = DateTime.now();
 List<ShoeDataModel> shoes = [
   ShoeDataModel(
-    name: 'Jordan 1 Retro High Tie Dye',
-    brand: 'Jordan',
-    price: 235.00,
+    shoeId: const Uuid().v4(),
+    name: 'Nike Ash Air',
+    brand: 'Nike',
+    price: 190.00,
     availableSizes: [
       39,
       39.5,
@@ -17,9 +19,9 @@ List<ShoeDataModel> shoes = [
         'Engineered to crush any movement-based workout, these On sneakers enhance the label\'s original Cloud sneaker with cutting edge technologies for a pair.',
     availableColors: ['red', 'blue', 'yellow', 'black', 'white'],
     images: [
-      'images/img-1.png',
-      'images/jordan1.avif',
-      'images/jordan2.png',
+      'images/nike1.png',
+      'images/nike3.png',
+      'images/nike4.png',
     ],
     releaseDate: DateTime(
       now.year,

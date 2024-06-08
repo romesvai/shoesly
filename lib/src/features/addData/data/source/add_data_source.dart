@@ -7,7 +7,10 @@ import 'package:shoesly_ps/src/features/reviews/domain/model/review_data_model.d
 abstract class AddDataSource {
   Future<void> addShoes(List<ShoeDataModel> shoes);
 
-  Future<void> addReviews(List<ReviewDataModel> reviews);
+  Future<void> addReviews({
+    required List<ReviewDataModel> reviews,
+    required String shoeDocId,
+  });
 }
 
 @Injectable(as: AddDataSource)
@@ -16,8 +19,24 @@ class AddDataRemoteSourceImpl implements AddDataSource {
 
   final FirebaseFirestore _firebaseFirestore;
   @override
-  Future<void> addReviews(List<ReviewDataModel> reviews) async {
-    // TODO: implement addReviews
+  Future<void> addReviews({
+    required List<ReviewDataModel> reviews,
+    required String shoeDocId,
+  }) async {
+    WriteBatch batch = _firebaseFirestore.batch();
+    final shoeDocRef =
+        _firebaseFirestore.collection(shoesCollection).doc(shoeDocId);
+    final reviewCollectionRef = shoeDocRef.collection(reviewsCollection);
+    final totalReviews = reviews.length;
+    final averageRating = reviews.fold(0.0,
+            (previousValue, review) => previousValue + review.reviewStars) /
+        reviews.length;
+    batch.update(shoeDocRef,
+        {'averageRating': averageRating, 'totalReviews': totalReviews});
+    for (ReviewDataModel review in reviews) {
+      batch.set(reviewCollectionRef.doc(), review.toJson());
+    }
+    return await batch.commit();
   }
 
   @override
@@ -25,7 +44,7 @@ class AddDataRemoteSourceImpl implements AddDataSource {
     WriteBatch batch = _firebaseFirestore.batch();
     final collectionRef = _firebaseFirestore.collection(shoesCollection);
     for (ShoeDataModel shoe in shoes) {
-      batch.set(collectionRef.doc(), shoe.toJson());
+      batch.set(collectionRef.doc(shoe.shoeId), shoe.toJson());
     }
     return await batch.commit();
   }

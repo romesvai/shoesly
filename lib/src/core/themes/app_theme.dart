@@ -6,8 +6,8 @@ import 'package:shoesly_ps/src/core/themes/typography/app_text_theme.dart';
 
 const _colorScheme = ColorScheme(
   brightness: Brightness.dark,
-  primary: AppColors.homeAppBar,
-  onPrimary: Color(0xFF003350),
+  primary: AppColors.white,
+  onPrimary: AppColors.textBlack,
   primaryContainer: Color(0xFF004B72),
   onPrimaryContainer: Color(0xFFCCE5FF),
   secondary: Color(0xFFB8C8D9),
@@ -22,11 +22,8 @@ const _colorScheme = ColorScheme(
   errorContainer: Color(0xFF93000A),
   onError: Color(0xFF690005),
   onErrorContainer: Color(0xFFFFDAD6),
-  background: AppColors.background,
-  onBackground: Color(0xFFE2E2E5),
   surface: Color(0xFF1A1C1E),
   onSurface: Color(0xFFC6C6C9),
-  surfaceVariant: Color(0xFF42474E),
   onSurfaceVariant: Color(0xFFC2C7CE),
   outline: Color(0xFF8C9198),
   onInverseSurface: Color(0xFF1A1C1E),
@@ -55,7 +52,7 @@ abstract class AppTheme {
   );
 
   static const _navigationBarTheme = NavigationBarThemeData(
-    backgroundColor: AppColors.background,
+    backgroundColor: AppColors.white,
   );
 
   static TextTheme get _appTextTheme => AppTextTheme.light(_colorScheme);
@@ -77,10 +74,9 @@ abstract class AppTheme {
   );
 
   static ThemeData get appTheme => ThemeData(
-        scaffoldBackgroundColor: AppColors.background,
+        scaffoldBackgroundColor: AppColors.white,
         brightness: Brightness.dark,
         colorScheme: _colorScheme,
-        useMaterial3: true,
         fontFamily: GoogleFonts.inter().fontFamily,
         textTheme: _appTextTheme,
         elevatedButtonTheme: _elevatedButtonTheme,
@@ -93,7 +89,7 @@ abstract class AppTheme {
         appBarTheme: AppBarTheme(
           elevation: 0,
           scrolledUnderElevation: 0,
-          backgroundColor: AppColors.background,
+          backgroundColor: AppColors.white,
           surfaceTintColor: _colorScheme.primary,
           titleTextStyle: _appTextTheme.titleMedium,
           systemOverlayStyle: SystemUiOverlayStyle.light.copyWith(
