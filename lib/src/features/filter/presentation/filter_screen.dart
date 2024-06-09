@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:gap/gap.dart';
-import 'package:shoesly_ps/gen/assets.gen.dart';
 import 'package:shoesly_ps/src/core/constants/number_constants.dart';
 import 'package:shoesly_ps/src/core/constants/shoesly_constants.dart';
 import 'package:shoesly_ps/src/core/extensions/context_extensions.dart';

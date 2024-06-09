@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:shoesly_ps/gen/assets.gen.dart';
-import 'package:shoesly_ps/src/core/themes/app_colors.dart';
 
 class CustomColorContainer extends StatelessWidget {
   const CustomColorContainer({
