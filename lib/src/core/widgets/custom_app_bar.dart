@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:shoesly_ps/src/core/themes/app_colors.dart';
 import 'package:shoesly_ps/src/core/widgets/custom_back_button.dart';
 
@@ -44,13 +45,16 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
       return null;
     }
 
-    return AppBar(
-      automaticallyImplyLeading: automaticallyImplyLeading,
-      centerTitle: centerTitle,
-      backgroundColor: backgroundColor,
-      title: title,
-      actions: actions,
-      leading: effectiveLeading(),
+    return Padding(
+      padding: EdgeInsets.symmetric(horizontal: 16.w),
+      child: AppBar(
+        automaticallyImplyLeading: automaticallyImplyLeading,
+        centerTitle: centerTitle,
+        backgroundColor: backgroundColor,
+        title: title,
+        actions: actions,
+        leading: effectiveLeading(),
+      ),
     );
   }
 }

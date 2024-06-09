@@ -15,7 +15,7 @@ abstract class AppTextTheme {
     decoration: TextDecoration.none,
     fontWeight: AppFontWeight.semiBold,
     textBaseline: TextBaseline.alphabetic,
-    color: AppColors.white,
+    color: AppColors.textBlack,
   );
 
   /// display large

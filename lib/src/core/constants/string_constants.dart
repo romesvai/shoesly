@@ -1,4 +1,9 @@
-const brandAll = 'All';
+const all = 'All';
 const nike = 'Nike';
 const adidas = 'Adidas';
 const jordan = 'Jordan';
+const oneStar = '1 Star';
+const twoStar = '2 Stars';
+const threeStar = '3 Stars';
+const fourStar = '4 Stars';
+const fiveStar = '5 Stars';

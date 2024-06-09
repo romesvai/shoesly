@@ -8,20 +8,20 @@ class DiscoverState with _$DiscoverState {
     DocumentSnapshot? lastDocument,
     List<ShoeDataModel>? shoes,
     Map<String, List<String>>? shoeImages,
-    List<BrandState>? brands,
+    List<SelectableDataState>? brands,
   }) = _DiscoverState;
 
   const DiscoverState._();
 }
 
 @freezed
-class BrandState with _$BrandState {
-  const factory BrandState({
-    required String brandName,
+class SelectableDataState with _$SelectableDataState {
+  const factory SelectableDataState({
+    required String displayName,
     @Default(false) bool isSelected,
-  }) = _BrandState;
+  }) = _SelectableDataState;
 
-  const BrandState._();
+  const SelectableDataState._();
 }
 
 @freezed

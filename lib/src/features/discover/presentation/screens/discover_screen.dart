@@ -10,6 +10,7 @@ import 'package:shoesly_ps/src/core/constants/string_constants.dart';
 import 'package:shoesly_ps/src/core/di/injector.dart';
 import 'package:shoesly_ps/src/core/extensions/context_extensions.dart';
 import 'package:shoesly_ps/src/core/extensions/number_extensions.dart';
+import 'package:shoesly_ps/src/core/router/app_router.dart';
 import 'package:shoesly_ps/src/core/themes/app_colors.dart';
 import 'package:shoesly_ps/src/core/themes/typography/app_text_theme.dart';
 import 'package:shoesly_ps/src/core/widgets/custom_data_fetching_loader.dart';
@@ -34,7 +35,8 @@ class DiscoverScreen extends StatelessWidget {
                 Gap(50.h),
                 const DiscoverHeadingWidget(),
                 Gap(24.h),
-                BlocSelector<DiscoverCubit, DiscoverState, List<BrandState>?>(
+                BlocSelector<DiscoverCubit, DiscoverState,
+                    List<SelectableDataState>?>(
                   selector: (state) => state.brands,
                   builder: (context, brands) {
                     if (brands == null) {
@@ -44,8 +46,9 @@ class DiscoverScreen extends StatelessWidget {
                       height: 30.h,
                       padding: EdgeInsets.only(left: 30.w),
                       child: ListView.separated(
-                        itemBuilder: (context, index) => BrandWidget(
-                          brand: brands[index],
+                        itemBuilder: (context, index) =>
+                            TappableSubheadingWidget(
+                          selectableData: brands[index],
                           onTap: () => context
                               .read<DiscoverCubit>()
                               .selectBrand(brands[index]),
@@ -164,89 +167,100 @@ class _ShoesGridWidgetState extends State<ShoesGridWidget> {
               return const SizedBox();
             }
           } else {
-            return Column(
-              children: <Widget>[
-                Stack(
-                  children: [
-                    CustomRoundedContainer(
-                      height: 170.r,
-                      width: 170.r,
-                      backgroundColor: AppColors.greyContainer,
-                      borderRadius: 20.circularBorderRadius,
-                    ),
-                    BlocBuilder<DiscoverCubit, DiscoverState>(
-                      builder: (context, state) {
-                        return CustomRoundedContainer(
-                          height: 170.r,
-                          width: 170.r,
-                          borderRadius: 20.circularBorderRadius,
-                          child: ClipRRect(
+            return GestureDetector(
+              onTap: () {
+                context.router.navigate(
+                  DetailRoute(
+                    shoe: widget.shoes[index],
+                  ),
+                );
+              },
+              child: Column(
+                children: <Widget>[
+                  Stack(
+                    children: [
+                      CustomRoundedContainer(
+                        height: 170.r,
+                        width: 170.r,
+                        backgroundColor: AppColors.greyContainer,
+                        borderRadius: 20.circularBorderRadius,
+                      ),
+                      BlocBuilder<DiscoverCubit, DiscoverState>(
+                        builder: (context, state) {
+                          return CustomRoundedContainer(
+                            height: 170.r,
+                            width: 170.r,
                             borderRadius: 20.circularBorderRadius,
-                            child: CachedNetworkImage(
-                              imageUrl: widget
-                                      .shoeImage[widget.shoes[index].shoeId]
-                                      ?.first ??
-                                  '',
-                              fit: BoxFit.cover,
+                            child: ClipRRect(
+                              borderRadius: 20.circularBorderRadius,
+                              child: CachedNetworkImage(
+                                imageUrl: widget
+                                        .shoeImage[widget.shoes[index].shoeId]
+                                        ?.first ??
+                                    '',
+                                fit: BoxFit.cover,
+                              ),
+                            ),
+                          );
+                        },
+                      ),
+                      Positioned(
+                        top: 23.h,
+                        left: 15.w,
+                        child: getBrandIcon(
+                          widget.shoes[index].brand,
+                        ),
+                      ),
+                    ],
+                  ),
+                  Column(
+                    children: <Widget>[
+                      Gap(10.h),
+                      Align(
+                        alignment: Alignment.centerLeft,
+                        child: Text(
+                          widget.shoes[index].name,
+                          style: AppTextTheme.bodySmall
+                              .copyWith(color: AppColors.title),
+                        ),
+                      ),
+                      Gap(8.h),
+                      Row(
+                        children: <Widget>[
+                          AssetsHelper.svgStarIcon.svg(),
+                          Gap(5.w),
+                          Text(
+                            widget.shoes[index].averageRating
+                                    ?.toStringAsFixed(1) ??
+                                '0.0',
+                            style: AppTextTheme.displaySmall.copyWith(
+                              fontSize: 11,
                             ),
                           ),
-                        );
-                      },
-                    ),
-                    Positioned(
-                      top: 23.h,
-                      left: 15.w,
-                      child: getBrandIcon(
-                        widget.shoes[index].brand,
+                          Gap(5.w),
+                          Text(
+                            '(${widget.shoes[index].totalReviews} Reviews)',
+                            style: AppTextTheme.bodySmall.copyWith(
+                              fontSize: 11,
+                              color: AppColors.textGrey,
+                            ),
+                          )
+                        ],
                       ),
-                    ),
-                  ],
-                ),
-                Column(
-                  children: <Widget>[
-                    Gap(10.h),
-                    Align(
-                      alignment: Alignment.centerLeft,
-                      child: Text(
-                        widget.shoes[index].name,
-                        style: AppTextTheme.bodySmall
-                            .copyWith(color: AppColors.title),
-                      ),
-                    ),
-                    Gap(8.h),
-                    Row(
-                      children: <Widget>[
-                        AssetsHelper.svgStarIcon.svg(),
-                        Gap(5.w),
-                        Text(
-                          widget.shoes[index].averageRating.toString(),
+                      Gap(5.h),
+                      Align(
+                        alignment: Alignment.centerLeft,
+                        child: Text(
+                          '\$${widget.shoes[index].price}',
                           style: AppTextTheme.displaySmall.copyWith(
-                            fontSize: 11,
+                            fontSize: 14,
                           ),
-                        ),
-                        Gap(5.w),
-                        Text(
-                          '(${widget.shoes[index].totalReviews} Reviews)',
-                          style: AppTextTheme.bodySmall.copyWith(
-                            fontSize: 11,
-                            color: AppColors.textGrey,
-                          ),
-                        )
-                      ],
-                    ),
-                    Gap(5.h),
-                    Align(
-                      alignment: Alignment.centerLeft,
-                      child: Text(
-                        '\$${widget.shoes[index].price}',
-                        style: AppTextTheme.displaySmall.copyWith(
-                          fontSize: 14,
                         ),
                       ),
-                    ),
-                  ],
-                ),
-              ],
+                    ],
+                  ),
+                ],
+              ),
             );
           }
         },
@@ -268,14 +282,14 @@ class _ShoesGridWidgetState extends State<ShoesGridWidget> {
   }
 }
 
-class BrandWidget extends StatelessWidget {
-  const BrandWidget({
+class TappableSubheadingWidget extends StatelessWidget {
+  const TappableSubheadingWidget({
     super.key,
-    required this.brand,
+    required this.selectableData,
     required this.onTap,
   });
 
-  final BrandState brand;
+  final SelectableDataState selectableData;
   final VoidCallback onTap;
 
   @override
@@ -285,9 +299,11 @@ class BrandWidget extends StatelessWidget {
       child: Padding(
         padding: const EdgeInsets.all(4),
         child: Text(
-          brand.brandName,
+          selectableData.displayName,
           style: AppTextTheme.displaySmall.copyWith(
-            color: brand.isSelected ? AppColors.textBlack : AppColors.textGrey,
+            color: selectableData.isSelected
+                ? AppColors.textBlack
+                : AppColors.textGrey,
           ),
         ),
       ),

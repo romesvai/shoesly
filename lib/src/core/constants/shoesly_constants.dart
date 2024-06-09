@@ -33,7 +33,35 @@ final ShoeDataModel shoes = ShoeDataModel(
   ),
 );
 
-const allBrands = BrandState(
-  brandName: brandAll,
+const allBrands = SelectableDataState(
+  displayName: all,
   isSelected: true,
 );
+
+/// Available stars to filter from
+const starsData = <SelectableDataState>[
+  SelectableDataState(
+    displayName: all,
+    isSelected: true,
+  ),
+  SelectableDataState(
+    displayName: oneStar,
+    isSelected: false,
+  ),
+  SelectableDataState(
+    displayName: twoStar,
+    isSelected: false,
+  ),
+  SelectableDataState(
+    displayName: threeStar,
+    isSelected: false,
+  ),
+  SelectableDataState(
+    displayName: fourStar,
+    isSelected: false,
+  ),
+  SelectableDataState(
+    displayName: fiveStar,
+    isSelected: false,
+  ),
+];

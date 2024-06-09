@@ -1,8 +1,10 @@
 import 'dart:math';
 
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 
 part 'review_data_model.freezed.dart';
+
 part 'review_data_model.g.dart';
 
 @freezed
@@ -15,6 +17,22 @@ class ReviewDataModel with _$ReviewDataModel {
   }) = _ReviewDataModel;
 
   const ReviewDataModel._();
+
+  factory ReviewDataModel.fromFirestore(
+    DocumentSnapshot<Map<String, dynamic>> snapshot,
+  ) {
+    final data = snapshot.data();
+    if (data == null) {
+      return ReviewDataModel(
+        reviewerName: '',
+        reviewStars: 0,
+        description: '',
+        reviewDate: DateTime.now(),
+      );
+    } else {
+      return ReviewDataModel.fromJson(data);
+    }
+  }
 
   factory ReviewDataModel.fromJson(Map<String, Object?> json) =>
       _$ReviewDataModelFromJson(json);

@@ -80,8 +80,8 @@ class DiscoverCubit extends Cubit<DiscoverState> {
             discoverLoadingState:
                 DiscoverLoadingState.xception(exception: exception)),
         (brandsResponse) {
-          final brands =
-              brandsResponse.map((brand) => BrandState(brandName: brand));
+          final brands = brandsResponse
+              .map((brand) => SelectableDataState(displayName: brand));
           return state.copyWith(
             brands: [allBrands, ...brands],
           );
@@ -107,7 +107,7 @@ class DiscoverCubit extends Cubit<DiscoverState> {
             lastDocument: state.lastDocument,
             limit: 4,
             brand: currentlySelectedBrand != allBrands
-                ? currentlySelectedBrand?.brandName
+                ? currentlySelectedBrand?.displayName
                 : null,
           ),
         )
@@ -166,10 +166,10 @@ class DiscoverCubit extends Cubit<DiscoverState> {
     );
   }
 
-  void selectBrand(BrandState selectedBrand) {
-    final currentBrands = List<BrandState>.from(state.brands ?? []);
+  void selectBrand(SelectableDataState selectedBrand) {
+    final currentBrands = List<SelectableDataState>.from(state.brands ?? []);
     final updatedBrands = currentBrands.map((brand) {
-      if (brand.brandName == selectedBrand.brandName) {
+      if (brand.displayName == selectedBrand.displayName) {
         return brand.copyWith(isSelected: true);
       } else {
         return brand.copyWith(isSelected: false);
