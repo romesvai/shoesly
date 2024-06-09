@@ -109,6 +109,9 @@ class ReviewCubit extends Cubit<ReviewState> {
   }
 
   void fetchAnotherPage() {
+    if (state.reviewLoadingState == const ReviewLoadingState.loading()) {
+      return;
+    }
     emit(
       state.copyWith(
         reviewLoadingState: const ReviewLoadingState.paginationLoading(),

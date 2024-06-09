@@ -189,6 +189,9 @@ class DiscoverCubit extends Cubit<DiscoverState> {
   }
 
   void fetchAnotherPage() {
+    if (state.discoverLoadingState == const DiscoverLoadingState.loading()) {
+      return;
+    }
     emit(
       state.copyWith(
         discoverLoadingState: const DiscoverLoadingState.paginationLoading(),
