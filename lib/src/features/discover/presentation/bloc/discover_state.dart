@@ -9,6 +9,7 @@ class DiscoverState with _$DiscoverState {
     List<ShoeDataModel>? shoes,
     Map<String, List<String>>? shoeImages,
     List<SelectableDataState>? brands,
+    @Default(RangeValues(minPriceValue, maxPriceValue)) RangeValues priceRange,
   }) = _DiscoverState;
 
   const DiscoverState._();

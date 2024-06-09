@@ -87,4 +87,16 @@ class DetailCubit extends Cubit<DetailState> {
       state.copyWith(selectedSize: size),
     );
   }
+
+  void setCurrentImage(int index) {
+    emit(
+      state.copyWith(currentImageIndex: index),
+    );
+  }
+
+  void setCurrentColor(int index) {
+    emit(
+      state.copyWith(currentColorIndex: index),
+    );
+  }
 }

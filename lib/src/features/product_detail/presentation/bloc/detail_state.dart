@@ -8,6 +8,8 @@ class DetailState with _$DetailState {
     List<String>? shoeImages,
     List<ReviewDataModel>? reviews,
     double? selectedSize,
+    @Default(0) currentImageIndex,
+    @Default(0) currentColorIndex,
   }) = _DetailState;
 
   const DetailState._();

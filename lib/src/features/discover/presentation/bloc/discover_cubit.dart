@@ -1,8 +1,10 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:fpdart/fpdart.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:injectable/injectable.dart';
+import 'package:shoesly_ps/src/core/constants/number_constants.dart';
 import 'package:shoesly_ps/src/core/constants/shoesly_constants.dart';
 import 'package:shoesly_ps/src/core/exceptions/base_exception.dart';
 import 'package:shoesly_ps/src/core/helper/firebase_image_helper.dart';
@@ -197,6 +199,12 @@ class DiscoverCubit extends Cubit<DiscoverState> {
         discoverLoadingState: const DiscoverLoadingState.paginationLoading(),
       ),
     );
-    _getShoes(isForPagination: false);
+    _getShoes(isForPagination: true);
+  }
+
+  void onPriceRangeChanged(RangeValues priceRange) {
+    emit(
+      state.copyWith(priceRange: priceRange),
+    );
   }
 }

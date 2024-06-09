@@ -8,5 +8,18 @@
   "connectionTimeout": "Connection timeout",
   "unexpectedNetworkError": "Unexpected network error",
   "discover": "Discover",
-  "all": "All"
+  "all": "All",
+  "filter": "Filter",
+  "totalReviewsText": "({noOfReviews} Reviews)",
+  "reviewHeadingText": "Review ({noOfReviews})",
+  "priceText": "${price}",
+  "seeAllReview": "See all review",
+  "price": "price",
+  "addToCart": "Add to cart",
+  "description": "Description",
+  "size": "Size",
+  "brands": "Brands",
+  "priceRange": "Price range"
+
+
 }

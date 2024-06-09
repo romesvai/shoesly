@@ -5,7 +5,9 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:gap/gap.dart';
 import 'package:shoesly_ps/gen/assets.gen.dart';
+import 'package:shoesly_ps/src/core/constants/string_constants.dart';
 import 'package:shoesly_ps/src/core/di/injector.dart';
+import 'package:shoesly_ps/src/core/extensions/context_extensions.dart';
 import 'package:shoesly_ps/src/core/extensions/number_extensions.dart';
 import 'package:shoesly_ps/src/core/router/app_router.dart';
 import 'package:shoesly_ps/src/core/themes/theme.dart';
@@ -16,6 +18,7 @@ import 'package:shoesly_ps/src/core/widgets/custom_rounded_container.dart';
 import 'package:shoesly_ps/src/core/widgets/custom_shimmer_widget.dart';
 import 'package:shoesly_ps/src/features/discover/domain/model/shoe_data_model.dart';
 import 'package:shoesly_ps/src/features/product_detail/presentation/bloc/detail_cubit.dart';
+import 'package:shoesly_ps/src/features/product_detail/presentation/widgets/custom_color_container.dart';
 import 'package:shoesly_ps/src/features/reviews/presentation/widgets/review_widget.dart';
 
 @RoutePage()
@@ -29,6 +32,7 @@ class DetailScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = context.l10n;
     return BlocProvider<DetailCubit>(
       create: (_) => getIt<DetailCubit>(
         param1: shoe,
@@ -77,7 +81,8 @@ class DetailScreen extends StatelessWidget {
                               DescriptionWidget(shoe: shoe),
                               Gap(30.h),
                               Text(
-                                'Review (${shoe.totalReviews})',
+                                l10n.reviewHeadingText(
+                                    shoe.totalReviews.toString()),
                                 style: AppTextTheme.titleMedium,
                               ),
                               Gap(16.h),
@@ -87,7 +92,7 @@ class DetailScreen extends StatelessWidget {
                                 ),
                               Gap(30.h),
                               AppButton.white(
-                                label: 'SEE ALL REVIEW',
+                                label: l10n.seeAllReview.toUpperCase(),
                                 onPressed: () {
                                   context.router.navigate(
                                     ReviewRoute(shoe: shoe),
@@ -123,6 +128,7 @@ class DetailBottomContainer extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = context.l10n;
     return BlocBuilder<DetailCubit, DetailState>(
       builder: (context, state) {
         return Container(
@@ -151,20 +157,20 @@ class DetailBottomContainer extends StatelessWidget {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          'Price',
+                          l10n.price,
                           style: AppTextTheme.bodySmall.copyWith(
                             color: AppColors.textGrey,
                           ),
                         ),
                         Gap(6.h),
                         Text(
-                          '\$${state.shoe?.price}',
+                          l10n.priceText(state.shoe?.price.toString() ?? ''),
                           style: AppTextTheme.displaySmall,
                         ),
                       ],
                     ),
                     AppButton.black(
-                      label: 'ADD TO CART',
+                      label: l10n.addToCart,
                       onPressed: () {},
                       fullWidth: false,
                       height: 50.h,
@@ -199,7 +205,7 @@ class DescriptionWidget extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          'Description',
+          context.l10n.description,
           style: AppTextTheme.titleMedium,
         ),
         Gap(12.h),
@@ -224,11 +230,12 @@ class SizeWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = context.l10n;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          'Size',
+          l10n.size,
           style: AppTextTheme.titleMedium,
         ),
         Gap(10.h),
@@ -303,7 +310,9 @@ class ReviewAndRatingsWidget extends StatelessWidget {
         ),
         Gap(8.w),
         Text(
-          '(${shoe.totalReviews} Reviews)',
+          context.l10n.totalReviewsText(
+            shoe.totalReviews.toString(),
+          ),
           style: AppTextTheme.displaySmall.copyWith(
             fontSize: 11,
             color: AppColors.textGrey,
@@ -343,7 +352,7 @@ class DetailImageWidget extends StatelessWidget {
                     );
                   }
                   return CachedNetworkImage(
-                    imageUrl: state.shoeImages?[0] ?? '',
+                    imageUrl: state.shoeImages?[state.currentImageIndex] ?? '',
                     fit: BoxFit.cover,
                   );
                 },
@@ -351,8 +360,85 @@ class DetailImageWidget extends StatelessWidget {
             ),
           ),
         ),
-        Positioned(left: 37.w, bottom: 26.h, child: const Text('hello'))
+        BlocBuilder<DetailCubit, DetailState>(
+          builder: (context, state) {
+            return Positioned(
+              left: 37.w,
+              bottom: 26.h,
+              child: SizedBox(
+                height: 8.h,
+                child: ListView.separated(
+                  scrollDirection: Axis.horizontal,
+                  shrinkWrap: true,
+                  itemBuilder: (context, index) =>
+                      index == state.currentImageIndex
+                          ? AssetsHelper.svgSelectedDotIcon.svg()
+                          : GestureDetector(
+                              onTap: () => context
+                                  .read<DetailCubit>()
+                                  .setCurrentImage(index),
+                              child: AssetsHelper.svgNotSelectedDotIcon.svg(),
+                            ),
+                  separatorBuilder: (_, __) => Gap(8.w),
+                  itemCount: state.shoeImages?.length ?? 0,
+                ),
+              ),
+            );
+          },
+        ),
+        BlocBuilder<DetailCubit, DetailState>(
+          builder: (context, state) {
+            return Positioned(
+              right: 10.w,
+              bottom: 16.h,
+              child: Container(
+                padding: EdgeInsets.symmetric(
+                  horizontal: 12.w,
+                ),
+                height: 40.h,
+                decoration: BoxDecoration(
+                  color: AppColors.white,
+                  borderRadius: 30.circularBorderRadius,
+                ),
+                child: ListView.separated(
+                  scrollDirection: Axis.horizontal,
+                  shrinkWrap: true,
+                  itemBuilder: (context, index) => GestureDetector(
+                    onTap: () =>
+                        context.read<DetailCubit>().setCurrentColor(index),
+                    child: CustomColorContainer(
+                      size: 20.r,
+                      color: getColorFromString(
+                        state.shoe?.availableColors[index] ?? red,
+                      ),
+                      isSelected: index == state.currentColorIndex,
+                    ),
+                  ),
+                  separatorBuilder: (_, __) => Gap(8.w),
+                  itemCount: state.shoe?.availableColors.length ?? 0,
+                ),
+              ),
+            );
+          },
+        )
       ],
     );
+  }
+
+  Color getColorFromString(String color) {
+    switch (color) {
+      case red:
+        return Colors.red;
+      case blue:
+        return Colors.blue;
+      case yellow:
+        return Colors.yellow;
+      case black:
+        return Colors.black;
+      case white:
+        return Colors.grey;
+      default:
+        return Colors.transparent;
+    }
   }
 }

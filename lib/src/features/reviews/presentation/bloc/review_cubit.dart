@@ -51,14 +51,17 @@ class ReviewCubit extends Cubit<ReviewState> {
         state.stars.firstWhere((star) => star.isSelected);
 
     final response = await _getReviewsUsecase
-        .execute(GetReviewsUsecaseInput(
-          shoeId: state.shoeId ?? '',
-          stars: currentSelectedStarFilter.displayName == all
-              ? null
-              : getStarFromDisplayName(
-                  currentSelectedStarFilter.displayName,
-                ),
-        ))
+        .execute(
+          GetReviewsUsecaseInput(
+            shoeId: state.shoeId ?? '',
+            stars: currentSelectedStarFilter.displayName == all
+                ? null
+                : getStarFromDisplayName(
+                    currentSelectedStarFilter.displayName,
+                  ),
+            lastDocument: state.lastDocument,
+          ),
+        )
         .run();
 
     response.match(
