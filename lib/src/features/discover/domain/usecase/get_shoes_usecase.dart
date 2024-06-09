@@ -20,6 +20,7 @@ class GetShoesUsecase
         final response = await _shoesRepository.getShoes(
           lastDocument: input.lastDocument,
           limit: input.limit,
+          brand: input.brand,
         );
         return response;
       });

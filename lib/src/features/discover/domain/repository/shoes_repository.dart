@@ -5,5 +5,8 @@ abstract class ShoesRepository {
   Future<ShoesResponseModel> getShoes({
     DocumentSnapshot? lastDocument,
     int limit = 10,
+    String? brand,
   });
+  
+  Future<List<String>> getBrands();
 }

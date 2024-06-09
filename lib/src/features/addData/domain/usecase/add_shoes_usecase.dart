@@ -12,12 +12,13 @@ class AddShoesUsecase
     with ExceptionMixin
     implements BaseUsecase<AddShoesUsecaseInput, Unit> {
   AddShoesUsecase(this._addDataRepository);
+
   final AddDataRepository _addDataRepository;
 
   @override
   EitherException<Unit> execute(AddShoesUsecaseInput input) =>
       tryCatch(() async {
-        await _addDataRepository.addShoes(input.shoes);
+        await _addDataRepository.addShoe(input.shoe);
         return unit;
       });
 }

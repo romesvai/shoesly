@@ -6,7 +6,7 @@ part 'add_shoes_usecase_input.freezed.dart';
 @freezed
 class AddShoesUsecaseInput with _$AddShoesUsecaseInput {
   const factory AddShoesUsecaseInput({
-    required List<ShoeDataModel> shoes,
+    required ShoeDataModel shoe,
   }) = _AddShoesUsecaseInput;
 
   const AddShoesUsecaseInput._();
