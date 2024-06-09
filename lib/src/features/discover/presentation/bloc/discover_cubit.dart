@@ -197,6 +197,6 @@ class DiscoverCubit extends Cubit<DiscoverState> {
         discoverLoadingState: const DiscoverLoadingState.paginationLoading(),
       ),
     );
-    _getShoes(isForPagination: true);
+    _getShoes(isForPagination: false);
   }
 }
