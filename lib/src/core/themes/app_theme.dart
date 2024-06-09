@@ -38,7 +38,8 @@ const _colorScheme = ColorScheme(
 abstract class AppTheme {
   static final _elevatedButtonTheme = ElevatedButtonThemeData(
     style: ElevatedButton.styleFrom(
-      shape: const StadiumBorder(),
+      shape:
+          const StadiumBorder(side: BorderSide(color: AppColors.greyContainer)),
     ),
   );
   static final _filledButtonTheme = FilledButtonThemeData(

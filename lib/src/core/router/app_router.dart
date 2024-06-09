@@ -7,11 +7,18 @@ export 'app_router.gr.dart';
 class AppRouter extends $AppRouter {
   @override
   RouteType get defaultRouteType => const RouteType.adaptive();
+
   @override
   List<AutoRoute> get routes => [
         AutoRoute(
           page: DiscoverRoute.page,
           initial: true,
+        ),
+        AutoRoute(
+          page: DetailRoute.page,
+        ),
+        AutoRoute(
+          page: ReviewRoute.page,
         ),
       ];
 }

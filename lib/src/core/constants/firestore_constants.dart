@@ -1,4 +1,7 @@
 const shoesCollection = 'shoes';
 const reviewsCollection = 'reviews';
-const shoeBrandKey = 'brand';
 const brandsCollection = 'brands';
+
+/// FIELD KEYS
+const shoeBrandKey = 'brand';
+const reviewStarsKey = 'reviewStars';
