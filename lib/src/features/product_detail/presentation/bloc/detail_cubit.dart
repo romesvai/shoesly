@@ -99,4 +99,22 @@ class DetailCubit extends Cubit<DetailState> {
       state.copyWith(currentColorIndex: index),
     );
   }
+
+  /// Increases quantity by one
+  void increaseQuantity() {
+    emit(
+      state.copyWith(quantity: state.quantity + 1),
+    );
+  }
+
+  /// Decreases quantity by one
+  void decreaseQuantity() {
+    if (state.quantity == 1) {
+      return;
+    }
+
+    emit(
+      state.copyWith(quantity: state.quantity - 1),
+    );
+  }
 }

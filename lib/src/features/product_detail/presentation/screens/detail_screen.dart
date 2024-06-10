@@ -9,6 +9,7 @@ import 'package:shoesly_ps/src/core/constants/string_constants.dart';
 import 'package:shoesly_ps/src/core/di/injector.dart';
 import 'package:shoesly_ps/src/core/extensions/context_extensions.dart';
 import 'package:shoesly_ps/src/core/extensions/number_extensions.dart';
+import 'package:shoesly_ps/src/core/extensions/string_extensions.dart';
 import 'package:shoesly_ps/src/core/helper/color_helper.dart';
 import 'package:shoesly_ps/src/core/router/app_router.dart';
 import 'package:shoesly_ps/src/core/themes/theme.dart';
@@ -158,7 +159,7 @@ class DetailBottomContainer extends StatelessWidget {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          l10n.price,
+                          l10n.price.capitalize(),
                           style: AppTextTheme.bodySmall.copyWith(
                             color: AppColors.textGrey,
                           ),
@@ -171,8 +172,166 @@ class DetailBottomContainer extends StatelessWidget {
                       ],
                     ),
                     AppButton.black(
-                      label: l10n.addToCart,
-                      onPressed: () {},
+                      label: l10n.addToCart.toUpperCase(),
+                      onPressed: () {
+                        showModalBottomSheet(
+                          isScrollControlled: true,
+                          backgroundColor: AppColors.white,
+                          context: context,
+                          builder: (_) {
+                            return BlocProvider<DetailCubit>.value(
+                              value: context.read<DetailCubit>(),
+                              child: Padding(
+                                padding: EdgeInsets.symmetric(
+                                  horizontal: 30.w,
+                                ),
+                                child: Column(
+                                  mainAxisSize: MainAxisSize.min,
+                                  crossAxisAlignment:
+                                      CrossAxisAlignment.stretch,
+                                  children: [
+                                    Gap(10.h),
+                                    Align(
+                                      alignment: Alignment.center,
+                                      child:
+                                          AssetsHelper.svgModalGreyIcon.svg(),
+                                    ),
+                                    Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceBetween,
+                                      children: [
+                                        Text(
+                                          l10n.addToCart,
+                                          style: AppTextTheme.displaySmall,
+                                        ),
+                                        IconButton(
+                                          onPressed: () {
+                                            context.maybePop();
+                                          },
+                                          icon: const Icon(
+                                            Icons.close,
+                                            color: AppColors.textBlack,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                    Gap(30.h),
+                                    Text(
+                                      l10n.quantity,
+                                      style: AppTextTheme.displaySmall.copyWith(
+                                        fontSize: 14,
+                                      ),
+                                    ),
+                                    Gap(8.h),
+                                    BlocSelector<DetailCubit, DetailState, int>(
+                                      selector: (state) => state.quantity,
+                                      builder: (context, quantity) {
+                                        return Row(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.spaceBetween,
+                                          children: [
+                                            Text(
+                                              quantity.toString(),
+                                              style: AppTextTheme.bodyMedium,
+                                            ),
+                                            Expanded(
+                                              child: Row(
+                                                mainAxisAlignment:
+                                                    MainAxisAlignment.end,
+                                                children: [
+                                                  GestureDetector(
+                                                    onTap: context
+                                                        .read<DetailCubit>()
+                                                        .decreaseQuantity,
+                                                    child: AssetsHelper
+                                                        .svgMinusCircleIcon
+                                                        .svg(
+                                                      colorFilter: quantity != 1
+                                                          ? const ColorFilter
+                                                              .mode(
+                                                              AppColors
+                                                                  .textBlack,
+                                                              BlendMode.srcIn,
+                                                            )
+                                                          : null,
+                                                    ),
+                                                  ),
+                                                  Gap(20.h),
+                                                  GestureDetector(
+                                                    onTap: context
+                                                        .read<DetailCubit>()
+                                                        .increaseQuantity,
+                                                    child: AssetsHelper
+                                                        .svgAddCircle
+                                                        .svg(),
+                                                  ),
+                                                  Gap(16.w),
+                                                ],
+                                              ),
+                                            ),
+                                          ],
+                                        );
+                                      },
+                                    ),
+                                    Gap(20.h),
+                                    Padding(
+                                      padding: EdgeInsets.only(
+                                        right: 16.w,
+                                      ),
+                                      child: const Divider(
+                                        color: AppColors.textBlack,
+                                      ),
+                                    ),
+                                    Gap(30.h),
+                                    Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceBetween,
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        Column(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          children: [
+                                            Text(
+                                              l10n.price.capitalize(),
+                                              style: AppTextTheme.bodySmall
+                                                  .copyWith(
+                                                color: AppColors.textGrey,
+                                              ),
+                                            ),
+                                            Gap(6.h),
+                                            Text(
+                                              l10n.priceText(state.shoe?.price
+                                                      .toString() ??
+                                                  ''),
+                                              style: AppTextTheme.displaySmall,
+                                            ),
+                                          ],
+                                        ),
+                                        AppButton.black(
+                                          label: l10n.addToCart.toUpperCase(),
+                                          onPressed: () {
+                                            // TODO(RL): Save data to cart
+                                          },
+                                          fullWidth: false,
+                                          height: 50.h,
+                                          textStyle: AppTextTheme.displaySmall
+                                              .copyWith(
+                                            fontSize: 14,
+                                            color: AppColors.white,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                    Gap(20.h),
+                                  ],
+                                ),
+                              ),
+                            );
+                          },
+                        );
+                      },
                       fullWidth: false,
                       height: 50.h,
                       textStyle: AppTextTheme.displaySmall.copyWith(

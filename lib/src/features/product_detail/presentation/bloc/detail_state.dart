@@ -10,6 +10,7 @@ class DetailState with _$DetailState {
     double? selectedSize,
     @Default(0) currentImageIndex,
     @Default(0) currentColorIndex,
+    @Default(1) quantity,
   }) = _DetailState;
 
   const DetailState._();

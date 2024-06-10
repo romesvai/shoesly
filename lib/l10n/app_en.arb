@@ -24,5 +24,6 @@
   "gender": "Gender",
   "color": "Color",
   "reset": "Reset ({noOfFiltersApplied})",
-  "apply": "Apply"
+  "apply": "Apply",
+  "quantity": "Quantity"
 }
