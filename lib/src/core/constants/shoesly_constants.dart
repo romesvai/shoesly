@@ -65,3 +65,21 @@ const starsData = <SelectableDataState>[
     isSelected: false,
   ),
 ];
+
+const sortBy = [
+  mostRecent,
+  lowestPrice,
+  highestReviews,
+];
+
+const genderFilters = [
+  man,
+  woman,
+  unisex,
+];
+
+const colorFilters = [
+  black,
+  red,
+  yellow,
+];

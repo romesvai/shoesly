@@ -19,7 +19,10 @@
   "description": "Description",
   "size": "Size",
   "brands": "Brands",
-  "priceRange": "Price range"
-
-
+  "priceRange": "Price range",
+  "sortBy": "Sort By",
+  "gender": "Gender",
+  "color": "Color",
+  "reset": "Reset ({noOfFiltersApplied})",
+  "apply": "Apply"
 }

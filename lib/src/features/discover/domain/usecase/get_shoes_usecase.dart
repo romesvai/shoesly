@@ -18,9 +18,7 @@ class GetShoesUsecase
   EitherException<ShoesResponseModel> execute(GetShoesUsecaseInput input) =>
       tryCatch(() async {
         final response = await _shoesRepository.getShoes(
-          lastDocument: input.lastDocument,
-          limit: input.limit,
-          brand: input.brand,
+          input: input,
         );
         return response;
       });

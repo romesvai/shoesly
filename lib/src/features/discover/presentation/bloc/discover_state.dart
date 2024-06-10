@@ -10,6 +10,10 @@ class DiscoverState with _$DiscoverState {
     Map<String, List<String>>? shoeImages,
     List<SelectableDataState>? brands,
     @Default(RangeValues(minPriceValue, maxPriceValue)) RangeValues priceRange,
+    String? sortBy,
+    String? gender,
+    String? color,
+    @Default(false) filterApplied,
   }) = _DiscoverState;
 
   const DiscoverState._();

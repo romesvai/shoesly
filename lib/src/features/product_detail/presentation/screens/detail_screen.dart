@@ -9,6 +9,7 @@ import 'package:shoesly_ps/src/core/constants/string_constants.dart';
 import 'package:shoesly_ps/src/core/di/injector.dart';
 import 'package:shoesly_ps/src/core/extensions/context_extensions.dart';
 import 'package:shoesly_ps/src/core/extensions/number_extensions.dart';
+import 'package:shoesly_ps/src/core/helper/color_helper.dart';
 import 'package:shoesly_ps/src/core/router/app_router.dart';
 import 'package:shoesly_ps/src/core/themes/theme.dart';
 import 'package:shoesly_ps/src/core/widgets/app_button.dart';
@@ -137,10 +138,10 @@ class DetailBottomContainer extends StatelessWidget {
             color: AppColors.white,
             boxShadow: [
               BoxShadow(
-                color: Colors.grey.withOpacity(0.2), // Set the shadow color
-                spreadRadius: 5, // Set the spread radius of the shadow
-                blurRadius: 7, // Set the blur radius of the shadow
-                offset: const Offset(0, -3), // Set the offset of the shadow
+                color: Colors.grey.withOpacity(0.2),
+                spreadRadius: 5,
+                blurRadius: 7,
+                offset: const Offset(0, -3),
               ),
             ],
           ),
@@ -408,7 +409,7 @@ class DetailImageWidget extends StatelessWidget {
                         context.read<DetailCubit>().setCurrentColor(index),
                     child: CustomColorContainer(
                       size: 20.r,
-                      color: getColorFromString(
+                      color: ColorHelper.getColorFromString(
                         state.shoe?.availableColors[index] ?? red,
                       ),
                       isSelected: index == state.currentColorIndex,
@@ -423,22 +424,5 @@ class DetailImageWidget extends StatelessWidget {
         )
       ],
     );
-  }
-
-  Color getColorFromString(String color) {
-    switch (color) {
-      case red:
-        return Colors.red;
-      case blue:
-        return Colors.blue;
-      case yellow:
-        return Colors.yellow;
-      case black:
-        return Colors.black;
-      case white:
-        return Colors.grey;
-      default:
-        return Colors.transparent;
-    }
   }
 }
