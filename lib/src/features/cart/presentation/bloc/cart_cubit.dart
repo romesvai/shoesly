@@ -22,13 +22,13 @@ class CartCubit extends Cubit<CartState> {
             cartLoadingState: CartLoadingState.initial(),
           ),
         ) {
-    _getCartItems();
+    getCartItems();
   }
 
   final GetCartItemUsecase _getCartItemUsecase;
   final RemoveCartItemUsecase _removeCartItemUsecase;
 
-  void _getCartItems() async {
+  void getCartItems() async {
     final response = await _getCartItemUsecase.execute(unit).run();
     emit(
       response.fold(
@@ -54,7 +54,7 @@ class CartCubit extends Cubit<CartState> {
       ),
     );
 
-    _getCartItems();
+    getCartItems();
   }
 
   Future<void> _getCartItemImages(List<CartItemDataModel> cartData) async {

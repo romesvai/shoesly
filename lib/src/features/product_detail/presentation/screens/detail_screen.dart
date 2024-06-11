@@ -235,7 +235,16 @@ class DetailBottomContainer extends StatelessWidget {
                                   crossAxisAlignment:
                                       CrossAxisAlignment.stretch,
                                   children: [
-                                    BlocBuilder<DetailCubit, DetailState>(
+                                    BlocConsumer<DetailCubit, DetailState>(
+                                      listener: (context, state) {
+                                        if (state.detailLoadingState ==
+                                            const DetailLoadingState
+                                                .addToCartSuccess()) {
+                                          context
+                                              .read<CartCubit>()
+                                              .getCartItems();
+                                        }
+                                      },
                                       builder: (context, state) {
                                         if (state.detailLoadingState ==
                                             const DetailLoadingState
