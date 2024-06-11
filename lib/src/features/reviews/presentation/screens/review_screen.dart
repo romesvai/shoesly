@@ -5,6 +5,7 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:gap/gap.dart';
 import 'package:shoesly_ps/gen/assets.gen.dart';
 import 'package:shoesly_ps/src/core/di/injector.dart';
+import 'package:shoesly_ps/src/core/extensions/context_extensions.dart';
 import 'package:shoesly_ps/src/core/themes/theme.dart';
 import 'package:shoesly_ps/src/core/widgets/custom_app_bar.dart';
 import 'package:shoesly_ps/src/core/widgets/custom_data_fetching_loader.dart';
@@ -28,83 +29,106 @@ class ReviewScreen extends StatelessWidget {
       create: (_) => getIt<ReviewCubit>(param1: shoe),
       child: Builder(
         builder: (context) {
-          return Scaffold(
-            appBar: CustomAppBar(
-              title: Text(
-                'Review (${shoe.totalReviews})',
-                style: AppTextTheme.titleMedium,
-              ),
-              actions: [
-                Padding(
-                  padding: EdgeInsets.only(
-                    right: 16.w,
-                  ),
-                  child: Row(
-                    children: [
-                      AssetsHelper.svgStarIcon.svg(),
-                      Gap(5.h),
-                      Text(
-                        shoe.averageRating?.toStringAsFixed(1) ?? '0.0',
-                        style: AppTextTheme.displaySmall.copyWith(
-                          fontSize: 14,
+          return BlocListener<ReviewCubit, ReviewState>(
+            listener: (context, state) {
+              state.reviewLoadingState.maybeWhen(
+                orElse: () {},
+                xception: (exception) {
+                  context.showSnackBar(
+                    Text(
+                      exception!.toLocalized(context.l10n),
+                      style: AppTextTheme.displayMedium.copyWith(
+                        fontSize: 14,
+                        color: AppColors.white,
+                      ),
+                    ),
+                    error: true,
+                  );
+                },
+              );
+            },
+            listenWhen: (previous, current) =>
+                previous.reviewLoadingState != current.reviewLoadingState,
+            child: Scaffold(
+              appBar: CustomAppBar(
+                title: Text(
+                  'Review (${shoe.totalReviews})',
+                  style: AppTextTheme.titleMedium,
+                ),
+                actions: [
+                  Padding(
+                    padding: EdgeInsets.only(
+                      right: 16.w,
+                    ),
+                    child: Row(
+                      children: [
+                        AssetsHelper.svgStarIcon.svg(),
+                        Gap(5.h),
+                        Text(
+                          shoe.averageRating?.toStringAsFixed(1) ?? '0.0',
+                          style: AppTextTheme.displaySmall.copyWith(
+                            fontSize: 14,
+                          ),
                         ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+              body: BlocBuilder<ReviewCubit, ReviewState>(
+                builder: (context, state) {
+                  final starsData = state.stars;
+                  return Column(
+                    children: [
+                      Gap(20.h),
+                      Container(
+                        height: 30.h,
+                        padding: EdgeInsets.only(left: 30.w),
+                        child: ListView.separated(
+                          itemBuilder: (context, index) =>
+                              TappableSubheadingWidget(
+                            selectableData: starsData[index],
+                            onTap: () => context
+                                .read<ReviewCubit>()
+                                .selectStarFilter(starsData[index]),
+                          ),
+                          scrollDirection: Axis.horizontal,
+                          separatorBuilder: (_, __) => Gap(16.w),
+                          itemCount: starsData.length,
+                        ),
+                      ),
+                      Gap(30.h),
+                      BlocBuilder<ReviewCubit, ReviewState>(
+                        builder: (context, state) {
+                          if (state.reviews == null) {
+                            return const Expanded(
+                              child: CustomDataFetchingLoader(),
+                            );
+                          }
+                          return Expanded(
+                            child: Padding(
+                              padding: EdgeInsets.symmetric(
+                                horizontal: 30.w,
+                              ),
+                              child: ReviewWidget.reviewsList(
+                                reviews: state.reviews!,
+                                showPaginationLoading:
+                                    state.reviewLoadingState ==
+                                            const ReviewLoadingState
+                                                .paginationLoading() &&
+                                        state.hasMoreDocuments,
+                                onPaginate: context
+                                    .read<ReviewCubit>()
+                                    .fetchAnotherPage,
+                              ),
+                            ),
+                          );
+                        },
                       ),
                     ],
-                  ),
-                ),
-              ],
-            ),
-            body: BlocBuilder<ReviewCubit, ReviewState>(
-              builder: (context, state) {
-                final starsData = state.stars;
-                return Column(
-                  children: [
-                    Gap(20.h),
-                    Container(
-                      height: 30.h,
-                      padding: EdgeInsets.only(left: 30.w),
-                      child: ListView.separated(
-                        itemBuilder: (context, index) =>
-                            TappableSubheadingWidget(
-                          selectableData: starsData[index],
-                          onTap: () => context
-                              .read<ReviewCubit>()
-                              .selectStarFilter(starsData[index]),
-                        ),
-                        scrollDirection: Axis.horizontal,
-                        separatorBuilder: (_, __) => Gap(16.w),
-                        itemCount: starsData.length,
-                      ),
-                    ),
-                    Gap(30.h),
-                    BlocBuilder<ReviewCubit, ReviewState>(
-                      builder: (context, state) {
-                        if (state.reviews == null) {
-                          return const Expanded(
-                            child: CustomDataFetchingLoader(),
-                          );
-                        }
-                        return Expanded(
-                          child: Padding(
-                            padding: EdgeInsets.symmetric(
-                              horizontal: 30.w,
-                            ),
-                            child: ReviewWidget.reviewsList(
-                              reviews: state.reviews!,
-                              showPaginationLoading: state.reviewLoadingState ==
-                                      const ReviewLoadingState
-                                          .paginationLoading() &&
-                                  state.hasMoreDocuments,
-                              onPaginate:
-                                  context.read<ReviewCubit>().fetchAnotherPage,
-                            ),
-                          ),
-                        );
-                      },
-                    ),
-                  ],
-                );
-              },
+                  );
+                },
+              ),
             ),
           );
         },
