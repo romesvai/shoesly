@@ -12,9 +12,6 @@
 
 - Ensure you have Flutter installed. If not, you can follow
   the [official Flutter installation guide](https://flutter.dev/docs/get-started/install).
-- Set up a Firebase project and add the necessary configurations for Firestore. You can follow
-  the [Firebase setup guide](https://firebase.flutter.dev/docs/overview) for integrating with
-  Flutter.
 
 ### Installation
 
