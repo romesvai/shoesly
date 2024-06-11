@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:injectable/injectable.dart';
 import 'package:shoesly_ps/src/core/constants/firestore_constants.dart';
+import 'package:shoesly_ps/src/core/mixins/network_connection_mixin.dart';
 import 'package:shoesly_ps/src/features/reviews/data/model/reviews_response_model.dart';
 import 'package:shoesly_ps/src/features/reviews/domain/model/get_reviews_usecase_input.dart';
 import 'package:shoesly_ps/src/features/reviews/domain/model/review_data_model.dart';
@@ -12,7 +13,9 @@ abstract class ReviewsRemoteSource {
 }
 
 @Injectable(as: ReviewsRemoteSource)
-class ReviewsRemoteSourceImpl implements ReviewsRemoteSource {
+class ReviewsRemoteSourceImpl
+    with NetworkConnectionMixin
+    implements ReviewsRemoteSource {
   ReviewsRemoteSourceImpl(this._firebaseFirestore);
 
   final FirebaseFirestore _firebaseFirestore;
@@ -21,6 +24,7 @@ class ReviewsRemoteSourceImpl implements ReviewsRemoteSource {
   Future<ReviewsResponseModel> getReviews({
     required GetReviewsUsecaseInput reviewsRequestModel,
   }) async {
+    await checkNetworkConnection();
     final limit = reviewsRequestModel.limit;
     Query<Map<String, dynamic>> query = _firebaseFirestore
         .collection(shoesCollection)

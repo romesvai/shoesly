@@ -28,76 +28,94 @@ class DiscoverScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Column(
-        children: <Widget>[
-          Gap(50.h),
-          const DiscoverHeadingWidget(),
-          Gap(24.h),
-          BlocSelector<DiscoverCubit, DiscoverState,
-              List<SelectableDataState>?>(
-            selector: (state) => state.brands,
-            builder: (context, brands) {
-              if (brands == null) {
-                return const SizedBox();
-              }
-              return Container(
-                height: 30.h,
-                padding: EdgeInsets.only(left: 30.w),
-                child: ListView.separated(
-                  itemBuilder: (context, index) => TappableSubheadingWidget(
-                    selectableData: brands[index],
-                    onTap: () => context
-                        .read<DiscoverCubit>()
-                        .selectBrand(brands[index]),
-                  ),
-                  scrollDirection: Axis.horizontal,
-                  separatorBuilder: (_, __) => Gap(16.w),
-                  itemCount: brands.length,
+      body: BlocListener<DiscoverCubit, DiscoverState>(
+        listener: (context, state) {
+          state.discoverLoadingState.maybeWhen(
+            orElse: () {},
+            xception: (exception) {
+              context.showSnackBar(
+                Text(
+                  exception!.toLocalized(context.l10n),
                 ),
+                error: true,
               );
             },
-          ),
-          Gap(10.h),
-          Expanded(
-            child: BlocBuilder<DiscoverCubit, DiscoverState>(
-              builder: (context, state) {
-                if (state.shoes == null) {
-                  return Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 30.w),
-                    child: CustomShimmerWidget(
-                      child: GridView.builder(
-                        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                          crossAxisCount: 2,
-                          mainAxisSpacing: 30.h,
-                          crossAxisSpacing: 15.w,
-                          childAspectRatio: 1,
-                        ),
-                        itemBuilder: (context, _) {
-                          return CustomRoundedContainer(
-                            height: 150.r,
-                            width: 150.r,
-                            backgroundColor: AppColors.greyContainer,
-                            borderRadius: 20.circularBorderRadius,
-                          );
-                        },
-                        itemCount: 6,
-                      ),
+          );
+        },
+        listenWhen: (previous, current) =>
+            previous.discoverLoadingState != current.discoverLoadingState,
+        child: Column(
+          children: <Widget>[
+            Gap(50.h),
+            const DiscoverHeadingWidget(),
+            Gap(24.h),
+            BlocSelector<DiscoverCubit, DiscoverState,
+                List<SelectableDataState>?>(
+              selector: (state) => state.brands,
+              builder: (context, brands) {
+                if (brands == null) {
+                  return const SizedBox();
+                }
+                return Container(
+                  height: 30.h,
+                  padding: EdgeInsets.only(left: 30.w),
+                  child: ListView.separated(
+                    itemBuilder: (context, index) => TappableSubheadingWidget(
+                      selectableData: brands[index],
+                      onTap: () => context
+                          .read<DiscoverCubit>()
+                          .selectBrand(brands[index]),
                     ),
-                  );
-                }
-                if (state.shoes!.isEmpty) {
-                  return Center(
-                    child: Text(context.l10n.noMatches),
-                  );
-                }
-                return ShoesGridWidget(
-                  shoes: state.shoes!,
-                  shoeImage: state.shoeImages ?? <String, List<String>>{},
+                    scrollDirection: Axis.horizontal,
+                    separatorBuilder: (_, __) => Gap(16.w),
+                    itemCount: brands.length,
+                  ),
                 );
               },
             ),
-          ),
-        ],
+            Gap(10.h),
+            Expanded(
+              child: BlocBuilder<DiscoverCubit, DiscoverState>(
+                builder: (context, state) {
+                  if (state.shoes == null) {
+                    return Padding(
+                      padding: EdgeInsets.symmetric(horizontal: 30.w),
+                      child: CustomShimmerWidget(
+                        child: GridView.builder(
+                          gridDelegate:
+                              SliverGridDelegateWithFixedCrossAxisCount(
+                            crossAxisCount: 2,
+                            mainAxisSpacing: 30.h,
+                            crossAxisSpacing: 15.w,
+                            childAspectRatio: 1,
+                          ),
+                          itemBuilder: (context, _) {
+                            return CustomRoundedContainer(
+                              height: 150.r,
+                              width: 150.r,
+                              backgroundColor: AppColors.greyContainer,
+                              borderRadius: 20.circularBorderRadius,
+                            );
+                          },
+                          itemCount: 6,
+                        ),
+                      ),
+                    );
+                  }
+                  if (state.shoes!.isEmpty) {
+                    return Center(
+                      child: Text(context.l10n.noMatches),
+                    );
+                  }
+                  return ShoesGridWidget(
+                    shoes: state.shoes!,
+                    shoeImage: state.shoeImages ?? <String, List<String>>{},
+                  );
+                },
+              ),
+            ),
+          ],
+        ),
       ),
       floatingActionButton: AppButton.black(
         label: context.l10n.filter.toUpperCase(),

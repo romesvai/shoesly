@@ -170,6 +170,7 @@ class DetailBottomContainer extends StatelessWidget {
                   color: AppColors.white,
                 ),
               ),
+              error: true,
             );
           },
         );

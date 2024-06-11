@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:injectable/injectable.dart';
 import 'package:shoesly_ps/src/core/constants/firestore_constants.dart';
 import 'package:shoesly_ps/src/core/constants/string_constants.dart';
+import 'package:shoesly_ps/src/core/mixins/network_connection_mixin.dart';
 import 'package:shoesly_ps/src/features/addData/data/model/brands_response_model.dart';
 import 'package:shoesly_ps/src/features/discover/data/model/shoes_response_model.dart';
 import 'package:shoesly_ps/src/features/discover/domain/model/get_shoes_usecase_input.dart';
@@ -14,7 +15,9 @@ abstract class ShoesRemoteDataSource {
 }
 
 @Injectable(as: ShoesRemoteDataSource)
-class ShoesRemoteDataSourceImpl implements ShoesRemoteDataSource {
+class ShoesRemoteDataSourceImpl
+    with NetworkConnectionMixin
+    implements ShoesRemoteDataSource {
   ShoesRemoteDataSourceImpl(this._firebaseFirestore);
 
   final FirebaseFirestore _firebaseFirestore;
@@ -23,6 +26,7 @@ class ShoesRemoteDataSourceImpl implements ShoesRemoteDataSource {
   Future<ShoesResponseModel> getShoes({
     required GetShoesUsecaseInput input,
   }) async {
+    await checkNetworkConnection();
     final limit = input.limit;
     final lastDocument = input.lastDocument;
     Query<Map<String, dynamic>> query =
@@ -120,6 +124,7 @@ class ShoesRemoteDataSourceImpl implements ShoesRemoteDataSource {
 
   @override
   Future<List<String>> getBrands() async {
+    await checkNetworkConnection();
     final response = await _firebaseFirestore
         .collection(brandsCollection)
         .withConverter(
