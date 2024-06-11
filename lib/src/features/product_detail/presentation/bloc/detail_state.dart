@@ -24,6 +24,8 @@ class DetailLoadingState with _$DetailLoadingState {
 
   const factory DetailLoadingState.success() = _Success;
 
+  const factory DetailLoadingState.addToCartSuccess() = _AddToCartSuccess;
+
   const factory DetailLoadingState.xception({BaseException? exception}) =
       _Exception;
 }

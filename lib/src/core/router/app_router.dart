@@ -26,5 +26,8 @@ class AppRouter extends $AppRouter {
         AutoRoute(
           page: FilterRoute.page,
         ),
+        AutoRoute(
+          page: CartRoute.page,
+        ),
       ];
 }

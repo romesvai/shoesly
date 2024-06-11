@@ -28,3 +28,6 @@ const highestReviews = 'Highest reviews';
 const man = 'Man';
 const woman = 'Woman';
 const unisex = 'Unisex';
+
+/// messages
+const selectSize = 'Please select a size';

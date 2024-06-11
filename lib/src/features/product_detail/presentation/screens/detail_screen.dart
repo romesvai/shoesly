@@ -18,6 +18,8 @@ import 'package:shoesly_ps/src/core/widgets/custom_app_bar.dart';
 import 'package:shoesly_ps/src/core/widgets/custom_ratings_bar.dart';
 import 'package:shoesly_ps/src/core/widgets/custom_rounded_container.dart';
 import 'package:shoesly_ps/src/core/widgets/custom_shimmer_widget.dart';
+import 'package:shoesly_ps/src/features/cart/domain/model/cart_item_data_model.dart';
+import 'package:shoesly_ps/src/features/cart/presentation/bloc/cart_cubit.dart';
 import 'package:shoesly_ps/src/features/discover/domain/model/shoe_data_model.dart';
 import 'package:shoesly_ps/src/features/product_detail/presentation/bloc/detail_cubit.dart';
 import 'package:shoesly_ps/src/features/product_detail/presentation/widgets/custom_color_container.dart';
@@ -49,8 +51,32 @@ class DetailScreen extends StatelessWidget {
                     right: 10.w,
                   ),
                   child: IconButton(
-                    icon: AssetsHelper.svgCartIcon.svg(),
-                    onPressed: () {},
+                    onPressed: () {
+                      context.router.navigate(
+                        const CartRoute(),
+                      );
+                    },
+                    icon: BlocSelector<CartCubit, CartState,
+                        List<CartItemDataModel>?>(
+                      selector: (state) => state.cartItems,
+                      builder: (context, cartItems) {
+                        return Stack(
+                          children: [
+                            AssetsHelper.svgCartIcon.svg(),
+                            if (cartItems?.isNotEmpty == true)
+                              Positioned(
+                                bottom: 12.h,
+                                right: 2.w,
+                                child: CustomColorContainer(
+                                  size: 8.r,
+                                  color: AppColors.error,
+                                  isSelected: false,
+                                ),
+                              ),
+                          ],
+                        );
+                      },
+                    ),
                   ),
                 ),
               ],
@@ -131,7 +157,25 @@ class DetailBottomContainer extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = context.l10n;
-    return BlocBuilder<DetailCubit, DetailState>(
+    return BlocConsumer<DetailCubit, DetailState>(
+      listener: (context, state) {
+        state.detailLoadingState.maybeWhen(
+          orElse: () {},
+          xception: (exception) {
+            context.showSnackBar(
+              Text(
+                exception!.toLocalized(l10n),
+                style: AppTextTheme.displayMedium.copyWith(
+                  fontSize: 14,
+                  color: AppColors.white,
+                ),
+              ),
+            );
+          },
+        );
+      },
+      listenWhen: (previous, current) =>
+          previous.detailLoadingState != current.detailLoadingState,
       builder: (context, state) {
         return Container(
           height: 90.h,
@@ -190,147 +234,95 @@ class DetailBottomContainer extends StatelessWidget {
                                   crossAxisAlignment:
                                       CrossAxisAlignment.stretch,
                                   children: [
-                                    Gap(10.h),
-                                    Align(
-                                      alignment: Alignment.center,
-                                      child:
-                                          AssetsHelper.svgModalGreyIcon.svg(),
-                                    ),
-                                    Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.spaceBetween,
-                                      children: [
-                                        Text(
-                                          l10n.addToCart,
-                                          style: AppTextTheme.displaySmall,
-                                        ),
-                                        IconButton(
-                                          onPressed: () {
-                                            context.maybePop();
-                                          },
-                                          icon: const Icon(
-                                            Icons.close,
-                                            color: AppColors.textBlack,
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                    Gap(30.h),
-                                    Text(
-                                      l10n.quantity,
-                                      style: AppTextTheme.displaySmall.copyWith(
-                                        fontSize: 14,
-                                      ),
-                                    ),
-                                    Gap(8.h),
-                                    BlocSelector<DetailCubit, DetailState, int>(
-                                      selector: (state) => state.quantity,
-                                      builder: (context, quantity) {
-                                        return Row(
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.spaceBetween,
-                                          children: [
-                                            Text(
-                                              quantity.toString(),
-                                              style: AppTextTheme.bodyMedium,
-                                            ),
-                                            Expanded(
-                                              child: Row(
+                                    BlocBuilder<DetailCubit, DetailState>(
+                                      builder: (context, state) {
+                                        if (state.detailLoadingState ==
+                                            const DetailLoadingState
+                                                .addToCartSuccess()) {
+                                          return Column(
+                                            children: [
+                                              Gap(30.h),
+                                              AssetsHelper.svgTickCircleIcon
+                                                  .svg(),
+                                              Gap(20.h),
+                                              Align(
+                                                alignment: Alignment.center,
+                                                child: Text(
+                                                  l10n.addedToCart,
+                                                  style: AppTextTheme
+                                                      .titleMedium
+                                                      .copyWith(
+                                                    fontSize: 24,
+                                                  ),
+                                                ),
+                                              ),
+                                              Gap(10.h),
+                                              Align(
+                                                alignment: Alignment.center,
+                                                child: Text(
+                                                  l10n.itemAdded(
+                                                      state.quantity),
+                                                  style:
+                                                      AppTextTheme.bodyMedium,
+                                                ),
+                                              ),
+                                              Gap(20.h),
+                                              Row(
                                                 mainAxisAlignment:
-                                                    MainAxisAlignment.end,
+                                                    MainAxisAlignment
+                                                        .spaceAround,
                                                 children: [
-                                                  GestureDetector(
-                                                    onTap: context
-                                                        .read<DetailCubit>()
-                                                        .decreaseQuantity,
-                                                    child: AssetsHelper
-                                                        .svgMinusCircleIcon
-                                                        .svg(
-                                                      colorFilter: quantity != 1
-                                                          ? const ColorFilter
-                                                              .mode(
-                                                              AppColors
-                                                                  .textBlack,
-                                                              BlendMode.srcIn,
-                                                            )
-                                                          : null,
+                                                  AppButton.white(
+                                                    label: l10n.backExplore
+                                                        .toUpperCase(),
+                                                    onPressed: () {
+                                                      context.maybePop();
+                                                    },
+                                                    fullWidth: false,
+                                                    height: 50.h,
+                                                    textStyle: AppTextTheme
+                                                        .displaySmall
+                                                        .copyWith(
+                                                      fontSize: 14,
+                                                      color:
+                                                          AppColors.textBlack,
                                                     ),
                                                   ),
-                                                  Gap(20.h),
-                                                  GestureDetector(
-                                                    onTap: context
-                                                        .read<DetailCubit>()
-                                                        .increaseQuantity,
-                                                    child: AssetsHelper
-                                                        .svgAddCircle
-                                                        .svg(),
+                                                  AppButton.black(
+                                                    label: l10n.toCart
+                                                        .toUpperCase(),
+                                                    onPressed: () {
+                                                      context.router.navigate(
+                                                        const CartRoute(),
+                                                      );
+                                                    },
+                                                    fullWidth: false,
+                                                    height: 50.h,
+                                                    textStyle: AppTextTheme
+                                                        .displaySmall
+                                                        .copyWith(
+                                                      fontSize: 14,
+                                                      color: AppColors.white,
+                                                    ),
                                                   ),
-                                                  Gap(16.w),
                                                 ],
                                               ),
-                                            ),
-                                          ],
-                                        );
+                                              Gap(30.h),
+                                            ],
+                                          );
+                                        } else {
+                                          return const AddToCartWidget();
+                                        }
                                       },
                                     ),
-                                    Gap(20.h),
-                                    Padding(
-                                      padding: EdgeInsets.only(
-                                        right: 16.w,
-                                      ),
-                                      child: const Divider(
-                                        color: AppColors.textBlack,
-                                      ),
-                                    ),
-                                    Gap(30.h),
-                                    Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.spaceBetween,
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: [
-                                        Column(
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.start,
-                                          children: [
-                                            Text(
-                                              l10n.price.capitalize(),
-                                              style: AppTextTheme.bodySmall
-                                                  .copyWith(
-                                                color: AppColors.textGrey,
-                                              ),
-                                            ),
-                                            Gap(6.h),
-                                            Text(
-                                              l10n.priceText(state.shoe?.price
-                                                      .toString() ??
-                                                  ''),
-                                              style: AppTextTheme.displaySmall,
-                                            ),
-                                          ],
-                                        ),
-                                        AppButton.black(
-                                          label: l10n.addToCart.toUpperCase(),
-                                          onPressed: () {
-                                            // TODO(RL): Save data to cart
-                                          },
-                                          fullWidth: false,
-                                          height: 50.h,
-                                          textStyle: AppTextTheme.displaySmall
-                                              .copyWith(
-                                            fontSize: 14,
-                                            color: AppColors.white,
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                    Gap(20.h),
                                   ],
                                 ),
                               ),
                             );
                           },
-                        );
+                        ).then((_) {
+                          context.read<DetailCubit>().resetAddToCartSuccess();
+                        });
                       },
                       fullWidth: false,
                       height: 50.h,
@@ -347,6 +339,159 @@ class DetailBottomContainer extends StatelessWidget {
           ),
         );
       },
+    );
+  }
+}
+
+class AddToCartWidget extends StatelessWidget {
+  const AddToCartWidget({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = context.l10n;
+    return Column(
+      children: [
+        Gap(10.h),
+        Align(
+          alignment: Alignment.center,
+          child: AssetsHelper.svgModalGreyIcon.svg(),
+        ),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Text(
+              l10n.addToCart,
+              style: AppTextTheme.displaySmall,
+            ),
+            IconButton(
+              onPressed: () {
+                context.maybePop();
+              },
+              icon: const Icon(
+                Icons.close,
+                color: AppColors.textBlack,
+              ),
+            ),
+          ],
+        ),
+        Gap(30.h),
+        Text(
+          l10n.quantity,
+          style: AppTextTheme.displaySmall.copyWith(
+            fontSize: 14,
+          ),
+        ),
+        Gap(8.h),
+        BlocSelector<DetailCubit, DetailState, int>(
+          selector: (state) => state.quantity,
+          builder: (context, quantity) {
+            return PriceQuantityRowWidget(
+              quantity: quantity,
+              onMinusButtonClick: context.read<DetailCubit>().decreaseQuantity,
+              onPlusButtonClick: context.read<DetailCubit>().increaseQuantity,
+            );
+          },
+        ),
+        Gap(20.h),
+        Padding(
+          padding: EdgeInsets.only(
+            right: 16.w,
+          ),
+          child: const Divider(
+            color: AppColors.textBlack,
+          ),
+        ),
+        Gap(30.h),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  l10n.price.capitalize(),
+                  style: AppTextTheme.bodySmall.copyWith(
+                    color: AppColors.textGrey,
+                  ),
+                ),
+                Gap(6.h),
+                BlocSelector<DetailCubit, DetailState, int>(
+                  selector: (state) => state.quantity,
+                  builder: (context, quantity) {
+                    return Text(
+                      l10n.priceText(
+                          context.read<DetailCubit>().state.shoe!.price *
+                              quantity),
+                      style: AppTextTheme.displaySmall,
+                    );
+                  },
+                ),
+              ],
+            ),
+            AppButton.black(
+              label: l10n.addToCart.toUpperCase(),
+              onPressed: context.read<DetailCubit>().addItemToCart,
+              fullWidth: false,
+              height: 50.h,
+              textStyle: AppTextTheme.displaySmall.copyWith(
+                fontSize: 14,
+                color: AppColors.white,
+              ),
+            ),
+          ],
+        ),
+        Gap(20.h)
+      ],
+    );
+  }
+}
+
+class PriceQuantityRowWidget extends StatelessWidget {
+  const PriceQuantityRowWidget(
+      {super.key,
+      required this.quantity,
+      required this.onMinusButtonClick,
+      required this.onPlusButtonClick});
+
+  final int quantity;
+  final VoidCallback onMinusButtonClick;
+  final VoidCallback onPlusButtonClick;
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        Text(
+          quantity.toString(),
+          style: AppTextTheme.bodyMedium,
+        ),
+        Expanded(
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.end,
+            children: [
+              GestureDetector(
+                onTap: onMinusButtonClick,
+                child: AssetsHelper.svgMinusCircleIcon.svg(
+                  colorFilter: quantity != 1
+                      ? const ColorFilter.mode(
+                          AppColors.textBlack,
+                          BlendMode.srcIn,
+                        )
+                      : null,
+                ),
+              ),
+              Gap(20.h),
+              GestureDetector(
+                onTap: onPlusButtonClick,
+                child: AssetsHelper.svgAddCircle.svg(),
+              ),
+              Gap(16.w),
+            ],
+          ),
+        ),
+      ],
     );
   }
 }

@@ -15,8 +15,11 @@ import 'package:shoesly_ps/src/core/widgets/app_button.dart';
 import 'package:shoesly_ps/src/core/widgets/custom_data_fetching_loader.dart';
 import 'package:shoesly_ps/src/core/widgets/custom_rounded_container.dart';
 import 'package:shoesly_ps/src/core/widgets/custom_shimmer_widget.dart';
+import 'package:shoesly_ps/src/features/cart/domain/model/cart_item_data_model.dart';
+import 'package:shoesly_ps/src/features/cart/presentation/bloc/cart_cubit.dart';
 import 'package:shoesly_ps/src/features/discover/domain/model/shoe_data_model.dart';
 import 'package:shoesly_ps/src/features/discover/presentation/bloc/discover_cubit.dart';
+import 'package:shoesly_ps/src/features/product_detail/presentation/widgets/custom_color_container.dart';
 
 @RoutePage()
 class DiscoverScreen extends StatelessWidget {
@@ -82,6 +85,11 @@ class DiscoverScreen extends StatelessWidget {
                     ),
                   );
                 }
+                if (state.shoes!.isEmpty) {
+                  return Center(
+                    child: Text(context.l10n.noMatches),
+                  );
+                }
                 return ShoesGridWidget(
                   shoes: state.shoes!,
                   shoeImage: state.shoeImages ?? <String, List<String>>{},
@@ -95,7 +103,7 @@ class DiscoverScreen extends StatelessWidget {
         label: context.l10n.filter.toUpperCase(),
         onPressed: () {
           context.router.navigate(
-            FilterRoute(),
+            const FilterRoute(),
           );
         },
         fullWidth: false,
@@ -322,8 +330,31 @@ class DiscoverHeadingWidget extends StatelessWidget {
             style: AppTextTheme.displayMedium,
           ),
           IconButton(
-            onPressed: () {},
-            icon: AssetsHelper.svgCartIcon.svg(),
+            onPressed: () {
+              context.router.navigate(
+                const CartRoute(),
+              );
+            },
+            icon: BlocSelector<CartCubit, CartState, List<CartItemDataModel>?>(
+              selector: (state) => state.cartItems,
+              builder: (context, cartItems) {
+                return Stack(
+                  children: [
+                    AssetsHelper.svgCartIcon.svg(),
+                    if (cartItems?.isNotEmpty == true)
+                      Positioned(
+                        bottom: 12.h,
+                        right: 2.w,
+                        child: CustomColorContainer(
+                          size: 8.r,
+                          color: AppColors.error,
+                          isSelected: false,
+                        ),
+                      ),
+                  ],
+                );
+              },
+            ),
           ),
         ],
       ),

@@ -1,11 +1,13 @@
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:shoesly_ps/src/core/di/injector.dart';
 import 'package:shoesly_ps/src/core/router/app_router.dart';
 import 'package:shoesly_ps/src/core/themes/app_theme.dart';
+import 'package:shoesly_ps/src/features/cart/presentation/bloc/cart_cubit.dart';
 
 class App extends StatelessWidget {
   const App({
@@ -14,7 +16,10 @@ class App extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const _MaterialApp();
+    return BlocProvider<CartCubit>(
+      create: (_) => getIt<CartCubit>(),
+      child: const _MaterialApp(),
+    );
   }
 }
 

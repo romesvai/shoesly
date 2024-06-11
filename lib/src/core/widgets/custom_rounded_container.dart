@@ -8,6 +8,7 @@ class CustomRoundedContainer extends StatelessWidget {
     required this.width,
     this.child,
     this.backgroundColor,
+    this.padding,
   });
 
   final Widget? child;
@@ -15,10 +16,12 @@ class CustomRoundedContainer extends StatelessWidget {
   final BorderRadius borderRadius;
   final double height;
   final double width;
+  final EdgeInsetsGeometry? padding;
 
   @override
   Widget build(BuildContext context) {
     return Container(
+      padding: padding,
       decoration: BoxDecoration(
         color: backgroundColor,
         borderRadius: borderRadius,
