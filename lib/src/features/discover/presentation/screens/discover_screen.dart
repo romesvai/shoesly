@@ -3,21 +3,23 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:flutter_svg/svg.dart';
 import 'package:gap/gap.dart';
 import 'package:shoesly_ps/gen/assets.gen.dart';
-import 'package:shoesly_ps/src/core/constants/string_constants.dart';
-import 'package:shoesly_ps/src/core/di/injector.dart';
 import 'package:shoesly_ps/src/core/extensions/context_extensions.dart';
 import 'package:shoesly_ps/src/core/extensions/number_extensions.dart';
+import 'package:shoesly_ps/src/core/helper/brand_icon_helper.dart';
 import 'package:shoesly_ps/src/core/router/app_router.dart';
 import 'package:shoesly_ps/src/core/themes/app_colors.dart';
 import 'package:shoesly_ps/src/core/themes/typography/app_text_theme.dart';
+import 'package:shoesly_ps/src/core/widgets/app_button.dart';
 import 'package:shoesly_ps/src/core/widgets/custom_data_fetching_loader.dart';
 import 'package:shoesly_ps/src/core/widgets/custom_rounded_container.dart';
 import 'package:shoesly_ps/src/core/widgets/custom_shimmer_widget.dart';
+import 'package:shoesly_ps/src/features/cart/domain/model/cart_item_data_model.dart';
+import 'package:shoesly_ps/src/features/cart/presentation/bloc/cart_cubit.dart';
 import 'package:shoesly_ps/src/features/discover/domain/model/shoe_data_model.dart';
 import 'package:shoesly_ps/src/features/discover/presentation/bloc/discover_cubit.dart';
+import 'package:shoesly_ps/src/features/product_detail/presentation/widgets/custom_color_container.dart';
 
 @RoutePage()
 class DiscoverScreen extends StatelessWidget {
@@ -25,82 +27,93 @@ class DiscoverScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocProvider<DiscoverCubit>(
-      create: (_) => getIt<DiscoverCubit>(),
-      child: Builder(
-        builder: (context) {
-          return Scaffold(
-            body: Column(
-              children: <Widget>[
-                Gap(50.h),
-                const DiscoverHeadingWidget(),
-                Gap(24.h),
-                BlocSelector<DiscoverCubit, DiscoverState,
-                    List<SelectableDataState>?>(
-                  selector: (state) => state.brands,
-                  builder: (context, brands) {
-                    if (brands == null) {
-                      return const SizedBox();
-                    }
-                    return Container(
-                      height: 30.h,
-                      padding: EdgeInsets.only(left: 30.w),
-                      child: ListView.separated(
-                        itemBuilder: (context, index) =>
-                            TappableSubheadingWidget(
-                          selectableData: brands[index],
-                          onTap: () => context
-                              .read<DiscoverCubit>()
-                              .selectBrand(brands[index]),
-                        ),
-                        scrollDirection: Axis.horizontal,
-                        separatorBuilder: (_, __) => Gap(16.w),
-                        itemCount: brands.length,
-                      ),
-                    );
-                  },
-                ),
-                Gap(10.h),
-                Expanded(
-                  child: BlocBuilder<DiscoverCubit, DiscoverState>(
-                    builder: (context, state) {
-                      if (state.shoes == null) {
-                        return Padding(
-                          padding: EdgeInsets.symmetric(horizontal: 30.w),
-                          child: CustomShimmerWidget(
-                            child: GridView.builder(
-                              gridDelegate:
-                                  SliverGridDelegateWithFixedCrossAxisCount(
-                                crossAxisCount: 2,
-                                mainAxisSpacing: 30.h,
-                                crossAxisSpacing: 15.w,
-                                childAspectRatio: 1,
-                              ),
-                              itemBuilder: (context, _) {
-                                return CustomRoundedContainer(
-                                  height: 150.r,
-                                  width: 150.r,
-                                  backgroundColor: AppColors.greyContainer,
-                                  borderRadius: 20.circularBorderRadius,
-                                );
-                              },
-                              itemCount: 6,
-                            ),
-                          ),
-                        );
-                      }
-                      return ShoesGridWidget(
-                        shoes: state.shoes!,
-                        shoeImage: state.shoeImages ?? <String, List<String>>{},
-                      );
-                    },
+    return Scaffold(
+      body: Column(
+        children: <Widget>[
+          Gap(50.h),
+          const DiscoverHeadingWidget(),
+          Gap(24.h),
+          BlocSelector<DiscoverCubit, DiscoverState,
+              List<SelectableDataState>?>(
+            selector: (state) => state.brands,
+            builder: (context, brands) {
+              if (brands == null) {
+                return const SizedBox();
+              }
+              return Container(
+                height: 30.h,
+                padding: EdgeInsets.only(left: 30.w),
+                child: ListView.separated(
+                  itemBuilder: (context, index) => TappableSubheadingWidget(
+                    selectableData: brands[index],
+                    onTap: () => context
+                        .read<DiscoverCubit>()
+                        .selectBrand(brands[index]),
                   ),
+                  scrollDirection: Axis.horizontal,
+                  separatorBuilder: (_, __) => Gap(16.w),
+                  itemCount: brands.length,
                 ),
-              ],
+              );
+            },
+          ),
+          Gap(10.h),
+          Expanded(
+            child: BlocBuilder<DiscoverCubit, DiscoverState>(
+              builder: (context, state) {
+                if (state.shoes == null) {
+                  return Padding(
+                    padding: EdgeInsets.symmetric(horizontal: 30.w),
+                    child: CustomShimmerWidget(
+                      child: GridView.builder(
+                        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                          crossAxisCount: 2,
+                          mainAxisSpacing: 30.h,
+                          crossAxisSpacing: 15.w,
+                          childAspectRatio: 1,
+                        ),
+                        itemBuilder: (context, _) {
+                          return CustomRoundedContainer(
+                            height: 150.r,
+                            width: 150.r,
+                            backgroundColor: AppColors.greyContainer,
+                            borderRadius: 20.circularBorderRadius,
+                          );
+                        },
+                        itemCount: 6,
+                      ),
+                    ),
+                  );
+                }
+                if (state.shoes!.isEmpty) {
+                  return Center(
+                    child: Text(context.l10n.noMatches),
+                  );
+                }
+                return ShoesGridWidget(
+                  shoes: state.shoes!,
+                  shoeImage: state.shoeImages ?? <String, List<String>>{},
+                );
+              },
             ),
+          ),
+        ],
+      ),
+      floatingActionButton: AppButton.black(
+        label: context.l10n.filter.toUpperCase(),
+        onPressed: () {
+          context.router.navigate(
+            const FilterRoute(),
           );
         },
+        fullWidth: false,
+        textStyle: AppTextTheme.displaySmall.copyWith(
+          fontSize: 14,
+          color: AppColors.white,
+        ),
+        icon: AssetsHelper.svgFilterIcon.svg(),
       ),
+      floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
     );
   }
 }
@@ -143,6 +156,7 @@ class _ShoesGridWidgetState extends State<ShoesGridWidget> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = context.l10n;
     return Padding(
       padding: EdgeInsets.symmetric(horizontal: 30.w),
       child: GridView.builder(
@@ -207,7 +221,7 @@ class _ShoesGridWidgetState extends State<ShoesGridWidget> {
                       Positioned(
                         top: 23.h,
                         left: 15.w,
-                        child: getBrandIcon(
+                        child: BrandIconHelper.getBrandIcon(
                           widget.shoes[index].brand,
                         ),
                       ),
@@ -239,7 +253,8 @@ class _ShoesGridWidgetState extends State<ShoesGridWidget> {
                           ),
                           Gap(5.w),
                           Text(
-                            '(${widget.shoes[index].totalReviews} Reviews)',
+                            l10n.totalReviewsText(
+                                widget.shoes[index].totalReviews.toString()),
                             style: AppTextTheme.bodySmall.copyWith(
                               fontSize: 11,
                               color: AppColors.textGrey,
@@ -251,7 +266,7 @@ class _ShoesGridWidgetState extends State<ShoesGridWidget> {
                       Align(
                         alignment: Alignment.centerLeft,
                         child: Text(
-                          '\$${widget.shoes[index].price}',
+                          l10n.priceText(widget.shoes[index].price),
                           style: AppTextTheme.displaySmall.copyWith(
                             fontSize: 14,
                           ),
@@ -266,19 +281,6 @@ class _ShoesGridWidgetState extends State<ShoesGridWidget> {
         },
       ),
     );
-  }
-
-  SvgPicture getBrandIcon(String brand) {
-    switch (brand) {
-      case jordan:
-        return AssetsHelper.svgJordanIcon.svg();
-      case adidas:
-        return AssetsHelper.svgAdidasIcon.svg();
-      case nike:
-        return AssetsHelper.svgNikeLogo.svg();
-      default:
-        return AssetsHelper.svgNikeLogo.svg();
-    }
   }
 }
 
@@ -328,8 +330,31 @@ class DiscoverHeadingWidget extends StatelessWidget {
             style: AppTextTheme.displayMedium,
           ),
           IconButton(
-            onPressed: () {},
-            icon: AssetsHelper.svgCartIcon.svg(),
+            onPressed: () {
+              context.router.navigate(
+                const CartRoute(),
+              );
+            },
+            icon: BlocSelector<CartCubit, CartState, List<CartItemDataModel>?>(
+              selector: (state) => state.cartItems,
+              builder: (context, cartItems) {
+                return Stack(
+                  children: [
+                    AssetsHelper.svgCartIcon.svg(),
+                    if (cartItems?.isNotEmpty == true)
+                      Positioned(
+                        bottom: 12.h,
+                        right: 2.w,
+                        child: CustomColorContainer(
+                          size: 8.r,
+                          color: AppColors.error,
+                          isSelected: false,
+                        ),
+                      ),
+                  ],
+                );
+              },
+            ),
           ),
         ],
       ),

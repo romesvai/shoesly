@@ -5,8 +5,12 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:gap/gap.dart';
 import 'package:shoesly_ps/gen/assets.gen.dart';
+import 'package:shoesly_ps/src/core/constants/string_constants.dart';
 import 'package:shoesly_ps/src/core/di/injector.dart';
+import 'package:shoesly_ps/src/core/extensions/context_extensions.dart';
 import 'package:shoesly_ps/src/core/extensions/number_extensions.dart';
+import 'package:shoesly_ps/src/core/extensions/string_extensions.dart';
+import 'package:shoesly_ps/src/core/helper/color_helper.dart';
 import 'package:shoesly_ps/src/core/router/app_router.dart';
 import 'package:shoesly_ps/src/core/themes/theme.dart';
 import 'package:shoesly_ps/src/core/widgets/app_button.dart';
@@ -14,8 +18,11 @@ import 'package:shoesly_ps/src/core/widgets/custom_app_bar.dart';
 import 'package:shoesly_ps/src/core/widgets/custom_ratings_bar.dart';
 import 'package:shoesly_ps/src/core/widgets/custom_rounded_container.dart';
 import 'package:shoesly_ps/src/core/widgets/custom_shimmer_widget.dart';
+import 'package:shoesly_ps/src/features/cart/domain/model/cart_item_data_model.dart';
+import 'package:shoesly_ps/src/features/cart/presentation/bloc/cart_cubit.dart';
 import 'package:shoesly_ps/src/features/discover/domain/model/shoe_data_model.dart';
 import 'package:shoesly_ps/src/features/product_detail/presentation/bloc/detail_cubit.dart';
+import 'package:shoesly_ps/src/features/product_detail/presentation/widgets/custom_color_container.dart';
 import 'package:shoesly_ps/src/features/reviews/presentation/widgets/review_widget.dart';
 
 @RoutePage()
@@ -29,6 +36,7 @@ class DetailScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = context.l10n;
     return BlocProvider<DetailCubit>(
       create: (_) => getIt<DetailCubit>(
         param1: shoe,
@@ -43,8 +51,32 @@ class DetailScreen extends StatelessWidget {
                     right: 10.w,
                   ),
                   child: IconButton(
-                    icon: AssetsHelper.svgCartIcon.svg(),
-                    onPressed: () {},
+                    onPressed: () {
+                      context.router.navigate(
+                        const CartRoute(),
+                      );
+                    },
+                    icon: BlocSelector<CartCubit, CartState,
+                        List<CartItemDataModel>?>(
+                      selector: (state) => state.cartItems,
+                      builder: (context, cartItems) {
+                        return Stack(
+                          children: [
+                            AssetsHelper.svgCartIcon.svg(),
+                            if (cartItems?.isNotEmpty == true)
+                              Positioned(
+                                bottom: 12.h,
+                                right: 2.w,
+                                child: CustomColorContainer(
+                                  size: 8.r,
+                                  color: AppColors.error,
+                                  isSelected: false,
+                                ),
+                              ),
+                          ],
+                        );
+                      },
+                    ),
                   ),
                 ),
               ],
@@ -77,7 +109,8 @@ class DetailScreen extends StatelessWidget {
                               DescriptionWidget(shoe: shoe),
                               Gap(30.h),
                               Text(
-                                'Review (${shoe.totalReviews})',
+                                l10n.reviewHeadingText(
+                                    shoe.totalReviews.toString()),
                                 style: AppTextTheme.titleMedium,
                               ),
                               Gap(16.h),
@@ -87,7 +120,7 @@ class DetailScreen extends StatelessWidget {
                                 ),
                               Gap(30.h),
                               AppButton.white(
-                                label: 'SEE ALL REVIEW',
+                                label: l10n.seeAllReview.toUpperCase(),
                                 onPressed: () {
                                   context.router.navigate(
                                     ReviewRoute(shoe: shoe),
@@ -123,7 +156,26 @@ class DetailBottomContainer extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return BlocBuilder<DetailCubit, DetailState>(
+    final l10n = context.l10n;
+    return BlocConsumer<DetailCubit, DetailState>(
+      listener: (context, state) {
+        state.detailLoadingState.maybeWhen(
+          orElse: () {},
+          xception: (exception) {
+            context.showSnackBar(
+              Text(
+                exception!.toLocalized(l10n),
+                style: AppTextTheme.displayMedium.copyWith(
+                  fontSize: 14,
+                  color: AppColors.white,
+                ),
+              ),
+            );
+          },
+        );
+      },
+      listenWhen: (previous, current) =>
+          previous.detailLoadingState != current.detailLoadingState,
       builder: (context, state) {
         return Container(
           height: 90.h,
@@ -131,10 +183,10 @@ class DetailBottomContainer extends StatelessWidget {
             color: AppColors.white,
             boxShadow: [
               BoxShadow(
-                color: Colors.grey.withOpacity(0.2), // Set the shadow color
-                spreadRadius: 5, // Set the spread radius of the shadow
-                blurRadius: 7, // Set the blur radius of the shadow
-                offset: const Offset(0, -3), // Set the offset of the shadow
+                color: Colors.grey.withOpacity(0.2),
+                spreadRadius: 5,
+                blurRadius: 7,
+                offset: const Offset(0, -3),
               ),
             ],
           ),
@@ -151,21 +203,127 @@ class DetailBottomContainer extends StatelessWidget {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          'Price',
+                          l10n.price.capitalize(),
                           style: AppTextTheme.bodySmall.copyWith(
                             color: AppColors.textGrey,
                           ),
                         ),
                         Gap(6.h),
                         Text(
-                          '\$${state.shoe?.price}',
+                          l10n.priceText(state.shoe?.price.toString() ?? ''),
                           style: AppTextTheme.displaySmall,
                         ),
                       ],
                     ),
                     AppButton.black(
-                      label: 'ADD TO CART',
-                      onPressed: () {},
+                      label: l10n.addToCart.toUpperCase(),
+                      onPressed: () {
+                        showModalBottomSheet(
+                          isScrollControlled: true,
+                          backgroundColor: AppColors.white,
+                          context: context,
+                          builder: (_) {
+                            return BlocProvider<DetailCubit>.value(
+                              value: context.read<DetailCubit>(),
+                              child: Padding(
+                                padding: EdgeInsets.symmetric(
+                                  horizontal: 30.w,
+                                ),
+                                child: Column(
+                                  mainAxisSize: MainAxisSize.min,
+                                  crossAxisAlignment:
+                                      CrossAxisAlignment.stretch,
+                                  children: [
+                                    BlocBuilder<DetailCubit, DetailState>(
+                                      builder: (context, state) {
+                                        if (state.detailLoadingState ==
+                                            const DetailLoadingState
+                                                .addToCartSuccess()) {
+                                          return Column(
+                                            children: [
+                                              Gap(30.h),
+                                              AssetsHelper.svgTickCircleIcon
+                                                  .svg(),
+                                              Gap(20.h),
+                                              Align(
+                                                alignment: Alignment.center,
+                                                child: Text(
+                                                  l10n.addedToCart,
+                                                  style: AppTextTheme
+                                                      .titleMedium
+                                                      .copyWith(
+                                                    fontSize: 24,
+                                                  ),
+                                                ),
+                                              ),
+                                              Gap(10.h),
+                                              Align(
+                                                alignment: Alignment.center,
+                                                child: Text(
+                                                  l10n.itemAdded(
+                                                      state.quantity),
+                                                  style:
+                                                      AppTextTheme.bodyMedium,
+                                                ),
+                                              ),
+                                              Gap(20.h),
+                                              Row(
+                                                mainAxisAlignment:
+                                                    MainAxisAlignment
+                                                        .spaceAround,
+                                                children: [
+                                                  AppButton.white(
+                                                    label: l10n.backExplore
+                                                        .toUpperCase(),
+                                                    onPressed: () {
+                                                      context.maybePop();
+                                                    },
+                                                    fullWidth: false,
+                                                    height: 50.h,
+                                                    textStyle: AppTextTheme
+                                                        .displaySmall
+                                                        .copyWith(
+                                                      fontSize: 14,
+                                                      color:
+                                                          AppColors.textBlack,
+                                                    ),
+                                                  ),
+                                                  AppButton.black(
+                                                    label: l10n.toCart
+                                                        .toUpperCase(),
+                                                    onPressed: () {
+                                                      context.router.navigate(
+                                                        const CartRoute(),
+                                                      );
+                                                    },
+                                                    fullWidth: false,
+                                                    height: 50.h,
+                                                    textStyle: AppTextTheme
+                                                        .displaySmall
+                                                        .copyWith(
+                                                      fontSize: 14,
+                                                      color: AppColors.white,
+                                                    ),
+                                                  ),
+                                                ],
+                                              ),
+                                              Gap(30.h),
+                                            ],
+                                          );
+                                        } else {
+                                          return const AddToCartWidget();
+                                        }
+                                      },
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            );
+                          },
+                        ).then((_) {
+                          context.read<DetailCubit>().resetAddToCartSuccess();
+                        });
+                      },
                       fullWidth: false,
                       height: 50.h,
                       textStyle: AppTextTheme.displaySmall.copyWith(
@@ -185,6 +343,159 @@ class DetailBottomContainer extends StatelessWidget {
   }
 }
 
+class AddToCartWidget extends StatelessWidget {
+  const AddToCartWidget({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = context.l10n;
+    return Column(
+      children: [
+        Gap(10.h),
+        Align(
+          alignment: Alignment.center,
+          child: AssetsHelper.svgModalGreyIcon.svg(),
+        ),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Text(
+              l10n.addToCart,
+              style: AppTextTheme.displaySmall,
+            ),
+            IconButton(
+              onPressed: () {
+                context.maybePop();
+              },
+              icon: const Icon(
+                Icons.close,
+                color: AppColors.textBlack,
+              ),
+            ),
+          ],
+        ),
+        Gap(30.h),
+        Text(
+          l10n.quantity,
+          style: AppTextTheme.displaySmall.copyWith(
+            fontSize: 14,
+          ),
+        ),
+        Gap(8.h),
+        BlocSelector<DetailCubit, DetailState, int>(
+          selector: (state) => state.quantity,
+          builder: (context, quantity) {
+            return PriceQuantityRowWidget(
+              quantity: quantity,
+              onMinusButtonClick: context.read<DetailCubit>().decreaseQuantity,
+              onPlusButtonClick: context.read<DetailCubit>().increaseQuantity,
+            );
+          },
+        ),
+        Gap(20.h),
+        Padding(
+          padding: EdgeInsets.only(
+            right: 16.w,
+          ),
+          child: const Divider(
+            color: AppColors.textBlack,
+          ),
+        ),
+        Gap(30.h),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  l10n.price.capitalize(),
+                  style: AppTextTheme.bodySmall.copyWith(
+                    color: AppColors.textGrey,
+                  ),
+                ),
+                Gap(6.h),
+                BlocSelector<DetailCubit, DetailState, int>(
+                  selector: (state) => state.quantity,
+                  builder: (context, quantity) {
+                    return Text(
+                      l10n.priceText(
+                          context.read<DetailCubit>().state.shoe!.price *
+                              quantity),
+                      style: AppTextTheme.displaySmall,
+                    );
+                  },
+                ),
+              ],
+            ),
+            AppButton.black(
+              label: l10n.addToCart.toUpperCase(),
+              onPressed: context.read<DetailCubit>().addItemToCart,
+              fullWidth: false,
+              height: 50.h,
+              textStyle: AppTextTheme.displaySmall.copyWith(
+                fontSize: 14,
+                color: AppColors.white,
+              ),
+            ),
+          ],
+        ),
+        Gap(20.h)
+      ],
+    );
+  }
+}
+
+class PriceQuantityRowWidget extends StatelessWidget {
+  const PriceQuantityRowWidget(
+      {super.key,
+      required this.quantity,
+      required this.onMinusButtonClick,
+      required this.onPlusButtonClick});
+
+  final int quantity;
+  final VoidCallback onMinusButtonClick;
+  final VoidCallback onPlusButtonClick;
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        Text(
+          quantity.toString(),
+          style: AppTextTheme.bodyMedium,
+        ),
+        Expanded(
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.end,
+            children: [
+              GestureDetector(
+                onTap: onMinusButtonClick,
+                child: AssetsHelper.svgMinusCircleIcon.svg(
+                  colorFilter: quantity != 1
+                      ? const ColorFilter.mode(
+                          AppColors.textBlack,
+                          BlendMode.srcIn,
+                        )
+                      : null,
+                ),
+              ),
+              Gap(20.h),
+              GestureDetector(
+                onTap: onPlusButtonClick,
+                child: AssetsHelper.svgAddCircle.svg(),
+              ),
+              Gap(16.w),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+}
+
 class DescriptionWidget extends StatelessWidget {
   const DescriptionWidget({
     super.key,
@@ -199,7 +510,7 @@ class DescriptionWidget extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          'Description',
+          context.l10n.description,
           style: AppTextTheme.titleMedium,
         ),
         Gap(12.h),
@@ -224,11 +535,12 @@ class SizeWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = context.l10n;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          'Size',
+          l10n.size,
           style: AppTextTheme.titleMedium,
         ),
         Gap(10.h),
@@ -303,7 +615,9 @@ class ReviewAndRatingsWidget extends StatelessWidget {
         ),
         Gap(8.w),
         Text(
-          '(${shoe.totalReviews} Reviews)',
+          context.l10n.totalReviewsText(
+            shoe.totalReviews.toString(),
+          ),
           style: AppTextTheme.displaySmall.copyWith(
             fontSize: 11,
             color: AppColors.textGrey,
@@ -343,7 +657,7 @@ class DetailImageWidget extends StatelessWidget {
                     );
                   }
                   return CachedNetworkImage(
-                    imageUrl: state.shoeImages?[0] ?? '',
+                    imageUrl: state.shoeImages?[state.currentImageIndex] ?? '',
                     fit: BoxFit.cover,
                   );
                 },
@@ -351,7 +665,67 @@ class DetailImageWidget extends StatelessWidget {
             ),
           ),
         ),
-        Positioned(left: 37.w, bottom: 26.h, child: const Text('hello'))
+        BlocBuilder<DetailCubit, DetailState>(
+          builder: (context, state) {
+            return Positioned(
+              left: 37.w,
+              bottom: 26.h,
+              child: SizedBox(
+                height: 8.h,
+                child: ListView.separated(
+                  scrollDirection: Axis.horizontal,
+                  shrinkWrap: true,
+                  itemBuilder: (context, index) =>
+                      index == state.currentImageIndex
+                          ? AssetsHelper.svgSelectedDotIcon.svg()
+                          : GestureDetector(
+                              onTap: () => context
+                                  .read<DetailCubit>()
+                                  .setCurrentImage(index),
+                              child: AssetsHelper.svgNotSelectedDotIcon.svg(),
+                            ),
+                  separatorBuilder: (_, __) => Gap(8.w),
+                  itemCount: state.shoeImages?.length ?? 0,
+                ),
+              ),
+            );
+          },
+        ),
+        BlocBuilder<DetailCubit, DetailState>(
+          builder: (context, state) {
+            return Positioned(
+              right: 10.w,
+              bottom: 16.h,
+              child: Container(
+                padding: EdgeInsets.symmetric(
+                  horizontal: 12.w,
+                ),
+                height: 40.h,
+                decoration: BoxDecoration(
+                  color: AppColors.white,
+                  borderRadius: 30.circularBorderRadius,
+                ),
+                child: ListView.separated(
+                  scrollDirection: Axis.horizontal,
+                  shrinkWrap: true,
+                  itemBuilder: (context, index) => GestureDetector(
+                    onTap: () =>
+                        context.read<DetailCubit>().setCurrentColor(index),
+                    child: CustomColorContainer(
+                      size: 20.r,
+                      color: ColorHelper.getColorFromString(
+                        state.shoe?.availableColors[index] ?? red,
+                      ),
+                      isSelected: index == state.currentColorIndex,
+                    ),
+                  ),
+                  separatorBuilder: (_, __) => Gap(8.w),
+                  itemCount: state.shoe?.availableColors.length ?? 0,
+                ),
+              ),
+            );
+          },
+        )
       ],
     );
   }

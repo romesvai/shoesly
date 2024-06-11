@@ -1,8 +1,10 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:fpdart/fpdart.dart';
 import 'package:freezed_annotation/freezed_annotation.dart';
 import 'package:injectable/injectable.dart';
+import 'package:shoesly_ps/src/core/constants/number_constants.dart';
 import 'package:shoesly_ps/src/core/constants/shoesly_constants.dart';
 import 'package:shoesly_ps/src/core/exceptions/base_exception.dart';
 import 'package:shoesly_ps/src/core/helper/firebase_image_helper.dart';
@@ -109,6 +111,19 @@ class DiscoverCubit extends Cubit<DiscoverState> {
             brand: currentlySelectedBrand != allBrands
                 ? currentlySelectedBrand?.displayName
                 : null,
+            priceRange: state.priceRange ==
+                    const RangeValues(
+                      minPriceValue,
+                      maxPriceValue,
+                    )
+                ? null
+                : PriceRangeModel(
+                    minPrice: state.priceRange.start,
+                    maxPrice: state.priceRange.end,
+                  ),
+            sortBy: state.sortBy,
+            gender: state.gender,
+            color: state.color,
           ),
         )
         .run();
@@ -166,7 +181,8 @@ class DiscoverCubit extends Cubit<DiscoverState> {
     );
   }
 
-  void selectBrand(SelectableDataState selectedBrand) {
+  void selectBrand(SelectableDataState selectedBrand,
+      {bool shouldFetchData = true}) {
     final currentBrands = List<SelectableDataState>.from(state.brands ?? []);
     final updatedBrands = currentBrands.map((brand) {
       if (brand.displayName == selectedBrand.displayName) {
@@ -184,8 +200,9 @@ class DiscoverCubit extends Cubit<DiscoverState> {
         shoes: null,
       ),
     );
-
-    _getShoes(shouldReset: true);
+    if (shouldFetchData) {
+      _getShoes(shouldReset: true);
+    }
   }
 
   void fetchAnotherPage() {
@@ -197,6 +214,106 @@ class DiscoverCubit extends Cubit<DiscoverState> {
         discoverLoadingState: const DiscoverLoadingState.paginationLoading(),
       ),
     );
-    _getShoes(isForPagination: false);
+    _getShoes(isForPagination: true);
+  }
+
+  void onPriceRangeChanged(RangeValues priceRange) {
+    emit(
+      state.copyWith(priceRange: priceRange),
+    );
+  }
+
+  void setSortBy({
+    required String sortBy,
+  }) {
+    emit(
+      state.copyWith(
+        sortBy: sortBy,
+      ),
+    );
+  }
+
+  void setGender({
+    required String gender,
+  }) {
+    emit(
+      state.copyWith(
+        gender: gender,
+      ),
+    );
+  }
+
+  void setColor({
+    required String color,
+  }) {
+    emit(
+      state.copyWith(
+        color: color,
+      ),
+    );
+  }
+
+  int getNumberOfAppliedFilters() {
+    int filtersApplied = 0;
+    final selectedBrand = state.brands?.firstWhere((brand) => brand.isSelected);
+    if (state.sortBy != null) {
+      filtersApplied++;
+    }
+    if (state.priceRange != const RangeValues(minPriceValue, maxPriceValue)) {
+      filtersApplied++;
+    }
+    if (selectedBrand?.displayName != allBrands.displayName) {
+      filtersApplied++;
+    }
+    if (state.gender != null) {
+      filtersApplied++;
+    }
+    if (state.color != null) {
+      filtersApplied++;
+    }
+    return filtersApplied;
+  }
+
+  void resetFilters() {
+    emit(
+      state.copyWith(
+        sortBy: null,
+        priceRange: const RangeValues(
+          minPriceValue,
+          maxPriceValue,
+        ),
+        gender: null,
+        color: null,
+      ),
+    );
+
+    selectBrand(
+      allBrands,
+      shouldFetchData: true,
+    );
+  }
+
+  void applyFilter() {
+    if (getNumberOfAppliedFilters() == 0) {
+      return;
+    }
+    emit(
+      state.copyWith(
+        filterApplied: true,
+      ),
+    );
+    emit(
+      state.copyWith(
+        lastDocument: null,
+        hasMoreDocuments: true,
+      ),
+    );
+    _getShoes(shouldReset: true);
+  }
+
+  void resetFilterAppliedFlag() {
+    emit(
+      state.copyWith(filterApplied: false),
+    );
   }
 }

@@ -8,6 +8,9 @@ class DetailState with _$DetailState {
     List<String>? shoeImages,
     List<ReviewDataModel>? reviews,
     double? selectedSize,
+    @Default(0) currentImageIndex,
+    @Default(0) currentColorIndex,
+    @Default(1) quantity,
   }) = _DetailState;
 
   const DetailState._();
@@ -20,6 +23,8 @@ class DetailLoadingState with _$DetailLoadingState {
   const factory DetailLoadingState.loading() = _Loading;
 
   const factory DetailLoadingState.success() = _Success;
+
+  const factory DetailLoadingState.addToCartSuccess() = _AddToCartSuccess;
 
   const factory DetailLoadingState.xception({BaseException? exception}) =
       _Exception;

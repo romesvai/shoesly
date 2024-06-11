@@ -10,7 +10,21 @@ class GetShoesUsecaseInput with _$GetShoesUsecaseInput {
     @Default(defaultPaginationLimit) int limit,
     DocumentSnapshot? lastDocument,
     String? brand,
+    PriceRangeModel? priceRange,
+    String? sortBy,
+    String? gender,
+    String? color,
   }) = _GetShoesUsecaseInput;
 
   const GetShoesUsecaseInput._();
+}
+
+@freezed
+class PriceRangeModel with _$PriceRangeModel {
+  const factory PriceRangeModel({
+    required double minPrice,
+    required double maxPrice,
+  }) = _PriceRangeModel;
+
+  const PriceRangeModel._();
 }

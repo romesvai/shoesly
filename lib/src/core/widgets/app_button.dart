@@ -24,6 +24,7 @@ class AppButton extends StatelessWidget {
     this.borderColor = AppColors.transparent,
     this.disabledButtonColor = AppColors.grey,
     this.fullWidth = true,
+    this.icon,
   });
 
   const AppButton.black({
@@ -45,6 +46,7 @@ class AppButton extends StatelessWidget {
     this.borderColor = AppColors.transparent,
     this.disabledButtonColor = AppColors.grey,
     this.fullWidth = true,
+    this.icon,
   });
 
   const AppButton.white({
@@ -66,6 +68,7 @@ class AppButton extends StatelessWidget {
     this.borderColor = AppColors.greyContainer,
     this.disabledButtonColor = AppColors.grey,
     this.fullWidth = true,
+    this.icon,
   });
 
   /// The maximum size of the button.
@@ -129,6 +132,7 @@ class AppButton extends StatelessWidget {
   final Color borderColor;
   final Color disabledButtonColor;
   final bool fullWidth;
+  final Widget? icon;
 
   @override
   Widget build(BuildContext context) {
@@ -172,24 +176,38 @@ class AppButton extends StatelessWidget {
     );
 
     return Container(
-      height: height,
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(36),
-        border: Border.all(color: borderColor),
-      ),
-      child: FilledButton(
-        onPressed: loading || !enabled ? null : onPressed,
-        style: enabled ? enabledButtonStyle : disabledButtonStyle,
-        child: loading
-            ? loader
-            : Text(
-                label,
-                style: textStyle ??
-                    AppTextTheme.displaySmall.copyWith(
-                      color: AppColors.white,
-                    ),
-              ),
-      ),
-    );
+        height: height,
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(36),
+          border: Border.all(color: borderColor),
+        ),
+        child: icon == null
+            ? FilledButton(
+                onPressed: loading || !enabled ? null : onPressed,
+                style: enabled ? enabledButtonStyle : disabledButtonStyle,
+                child: loading
+                    ? loader
+                    : Text(
+                        label,
+                        style: textStyle ??
+                            AppTextTheme.displaySmall.copyWith(
+                              color: AppColors.white,
+                            ),
+                      ),
+              )
+            : FilledButton.icon(
+                onPressed: loading || !enabled ? null : onPressed,
+                style: enabled ? enabledButtonStyle : disabledButtonStyle,
+                label: loading
+                    ? loader
+                    : Text(
+                        label,
+                        style: textStyle ??
+                            AppTextTheme.displaySmall.copyWith(
+                              color: AppColors.white,
+                            ),
+                      ),
+                icon: icon,
+              ));
   }
 }
